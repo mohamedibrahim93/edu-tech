@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { Card, CardHeader } from '@/components/ui/Card';
+import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
@@ -21,9 +21,9 @@ import {
   MapPin,
   Edit,
   Trash2,
-  Search
+  Search,
 } from 'lucide-react';
-import type { School, Teacher, Student, Class, User } from '@/lib/types';
+import type { School, User } from '@/lib/types';
 
 interface SchoolWithStats extends School {
   admin?: User;
@@ -91,7 +91,6 @@ export default function SchoolsPage() {
     const schoolId = editingSchool?.id || uuidv4();
     
     if (!editingSchool) {
-      // Create admin user for new school
       const adminUser: User = {
         id: adminId,
         email: formData.adminEmail,
@@ -143,20 +142,24 @@ export default function SchoolsPage() {
   };
 
   const handleDelete = async (school: SchoolWithStats) => {
-    if (confirm('Are you sure you want to delete this school? This will also delete all related data.')) {
+    if (confirm('Are you sure you want to delete this school?')) {
       await db.schools.delete(school.id);
       loadData();
     }
   };
 
+  const totalStudents = schools.reduce((sum, s) => sum + s.studentCount, 0);
+  const totalTeachers = schools.reduce((sum, s) => sum + s.teacherCount, 0);
+  const totalClasses = schools.reduce((sum, s) => sum + s.classCount, 0);
+
   if (user?.role !== 'moe') {
     return (
-      <DashboardLayout title="Schools" subtitle="Manage schools">
+      <DashboardLayout title="Schools" subtitle="Access Denied">
         <Card>
-          <div className="text-center py-12">
-            <Building2 className="w-12 h-12 mx-auto text-slate-400 mb-4" />
+          <CardContent className="p-16 text-center">
+            <Building2 className="w-12 h-12 mx-auto text-slate-300 mb-4" />
             <p className="text-slate-500">You don't have permission to view this page.</p>
-          </div>
+          </CardContent>
         </Card>
       </DashboardLayout>
     );
@@ -164,107 +167,121 @@ export default function SchoolsPage() {
 
   return (
     <DashboardLayout title="Schools" subtitle="Manage all registered schools">
-      <Card className="mb-6">
-        <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <input
-              type="text"
-              placeholder="Search schools..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:outline-none focus:border-indigo-500"
-            />
-          </div>
-          <Button onClick={() => setIsModalOpen(true)}>
-            <Plus className="w-4 h-4 mr-2" />
-            Add School
-          </Button>
-        </div>
-      </Card>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {filteredSchools.map((school) => (
-          <Card key={school.id} hover>
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
-                  <Building2 className="w-7 h-7 text-white" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-lg text-slate-900 dark:text-white">{school.name}</h3>
-                  <div className="flex items-center gap-1 text-sm text-slate-500">
-                    <MapPin className="w-4 h-4" />
-                    <span className="truncate max-w-[200px]">{school.address}</span>
-                  </div>
-                </div>
-              </div>
-              <div className="flex gap-1">
-                <button
-                  onClick={() => handleEdit(school)}
-                  className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
-                >
-                  <Edit className="w-4 h-4 text-slate-600 dark:text-slate-400" />
-                </button>
-                <button
-                  onClick={() => handleDelete(school)}
-                  className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                >
-                  <Trash2 className="w-4 h-4 text-red-500" />
-                </button>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-3 gap-3 mb-4">
-              <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-center">
-                <GraduationCap className="w-5 h-5 mx-auto text-blue-500 mb-1" />
-                <p className="text-lg font-bold text-blue-600">{school.studentCount}</p>
-                <p className="text-xs text-blue-600/70">Students</p>
-              </div>
-              <div className="p-3 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 text-center">
-                <Users className="w-5 h-5 mx-auto text-emerald-500 mb-1" />
-                <p className="text-lg font-bold text-emerald-600">{school.teacherCount}</p>
-                <p className="text-xs text-emerald-600/70">Teachers</p>
-              </div>
-              <div className="p-3 rounded-lg bg-purple-50 dark:bg-purple-900/20 text-center">
-                <BookOpen className="w-5 h-5 mx-auto text-purple-500 mb-1" />
-                <p className="text-lg font-bold text-purple-600">{school.classCount}</p>
-                <p className="text-xs text-purple-600/70">Classes</p>
-              </div>
-            </div>
-
-            <div className="space-y-2 pt-4 border-t border-slate-200 dark:border-slate-700">
-              <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
-                <Phone className="w-4 h-4" />
-                <span>{school.phone}</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
-                <Mail className="w-4 h-4" />
-                <span>{school.email}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-slate-500">Admin: {school.admin?.name || 'Not assigned'}</span>
-                <Badge variant={school.isActive ? 'success' : 'danger'}>
-                  {school.isActive ? 'Active' : 'Inactive'}
-                </Badge>
-              </div>
-            </div>
-          </Card>
-        ))}
+      {/* Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <StatCard icon={Building2} label="Total Schools" value={schools.length} color="purple" />
+        <StatCard icon={GraduationCap} label="Total Students" value={totalStudents} color="blue" />
+        <StatCard icon={Users} label="Total Teachers" value={totalTeachers} color="emerald" />
+        <StatCard icon={BookOpen} label="Total Classes" value={totalClasses} color="pink" />
       </div>
 
-      {filteredSchools.length === 0 && (
-        <Card>
-          <div className="text-center py-12">
-            <Building2 className="w-12 h-12 mx-auto text-slate-400 mb-4" />
-            <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-2">No Schools Found</h3>
-            <p className="text-slate-500 mb-4">Get started by adding your first school.</p>
+      {/* Main Content */}
+      <Card className="mb-6">
+        <CardContent className="p-6">
+          <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Search schools..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/10"
+              />
+            </div>
             <Button onClick={() => setIsModalOpen(true)}>
               <Plus className="w-4 h-4 mr-2" />
               Add School
             </Button>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Schools Grid */}
+      {filteredSchools.length === 0 ? (
+        <Card>
+          <CardContent className="p-16 text-center">
+            <Building2 className="w-12 h-12 mx-auto text-slate-300 mb-4" />
+            <h3 className="text-lg font-semibold text-slate-900 mb-2">No Schools Found</h3>
+            <p className="text-slate-500 mb-6">Get started by adding your first school.</p>
+            <Button onClick={() => setIsModalOpen(true)}>
+              <Plus className="w-4 h-4 mr-2" />
+              Add School
+            </Button>
+          </CardContent>
         </Card>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {filteredSchools.map((school) => (
+            <Card key={school.id} hover>
+              <CardContent className="p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
+                      <Building2 className="w-7 h-7 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-lg text-slate-900">{school.name}</h3>
+                      <div className="flex items-center gap-1 text-sm text-slate-500">
+                        <MapPin className="w-4 h-4" />
+                        <span className="truncate max-w-[200px]">{school.address}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex gap-1">
+                    <button
+                      onClick={() => handleEdit(school)}
+                      className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                    >
+                      <Edit className="w-4 h-4 text-slate-400" />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(school)}
+                      className="p-2 hover:bg-red-50 rounded-lg transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4 text-red-500" />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-3 mb-4">
+                  <div className="p-3 rounded-lg bg-blue-50 text-center">
+                    <GraduationCap className="w-5 h-5 mx-auto text-blue-600 mb-1" />
+                    <p className="text-lg font-bold text-blue-600">{school.studentCount}</p>
+                    <p className="text-xs text-blue-600/70">Students</p>
+                  </div>
+                  <div className="p-3 rounded-lg bg-emerald-50 text-center">
+                    <Users className="w-5 h-5 mx-auto text-emerald-600 mb-1" />
+                    <p className="text-lg font-bold text-emerald-600">{school.teacherCount}</p>
+                    <p className="text-xs text-emerald-600/70">Teachers</p>
+                  </div>
+                  <div className="p-3 rounded-lg bg-purple-50 text-center">
+                    <BookOpen className="w-5 h-5 mx-auto text-purple-600 mb-1" />
+                    <p className="text-lg font-bold text-purple-600">{school.classCount}</p>
+                    <p className="text-xs text-purple-600/70">Classes</p>
+                  </div>
+                </div>
+
+                <div className="space-y-2 pt-4 border-t border-slate-100">
+                  <div className="flex items-center gap-2 text-sm text-slate-600">
+                    <Phone className="w-4 h-4 text-slate-400" />
+                    {school.phone}
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-slate-600">
+                    <Mail className="w-4 h-4 text-slate-400" />
+                    {school.email}
+                  </div>
+                  <div className="flex items-center justify-between pt-2">
+                    <span className="text-sm text-slate-500">Admin: {school.admin?.name || 'Not assigned'}</span>
+                    <Badge variant={school.isActive ? 'success' : 'danger'} size="sm">
+                      {school.isActive ? 'Active' : 'Inactive'}
+                    </Badge>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       )}
 
       {/* Add/Edit Modal */}
@@ -279,8 +296,8 @@ export default function SchoolsPage() {
         size="lg"
       >
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="pb-4 border-b border-slate-200 dark:border-slate-700">
-            <h4 className="font-medium text-slate-900 dark:text-white mb-4">School Information</h4>
+          <div className="pb-4 border-b border-slate-200">
+            <h4 className="font-semibold text-slate-900 mb-4">School Information</h4>
             <div className="space-y-4">
               <Input
                 label="School Name"
@@ -318,7 +335,7 @@ export default function SchoolsPage() {
           
           {!editingSchool && (
             <div>
-              <h4 className="font-medium text-slate-900 dark:text-white mb-4">School Administrator</h4>
+              <h4 className="font-semibold text-slate-900 mb-4">School Administrator</h4>
               <div className="space-y-4">
                 <Input
                   label="Admin Name"
@@ -363,3 +380,27 @@ export default function SchoolsPage() {
   );
 }
 
+function StatCard({ icon: Icon, label, value, color }: { icon: React.ElementType; label: string; value: number; color: string }) {
+  const colors: Record<string, string> = {
+    purple: 'from-purple-600 to-pink-600',
+    blue: 'from-blue-600 to-cyan-600',
+    emerald: 'from-emerald-600 to-teal-600',
+    pink: 'from-pink-600 to-rose-600',
+  };
+
+  return (
+    <Card>
+      <CardContent className="p-6">
+        <div className="flex items-center gap-4">
+          <div className={`p-3 rounded-xl bg-gradient-to-br ${colors[color]}`}>
+            <Icon className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <p className="text-2xl font-bold text-slate-900">{value}</p>
+            <p className="text-sm text-slate-500">{label}</p>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}

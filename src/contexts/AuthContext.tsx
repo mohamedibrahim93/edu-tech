@@ -17,22 +17,9 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    const initAuth = async () => {
-      await seedDatabase();
-      const storedUserId = localStorage.getItem('edutech_user_id');
-      if (storedUserId) {
-        const user = await db.users.get(storedUserId);
-        if (user) {
-          setUser(user);
-        }
-      }
-      setIsLoading(false);
-    };
-    initAuth();
-  }, []);
-
+  // All hooks must be called before any conditional returns
   const login = useCallback(async (email: string, password: string): Promise<boolean> => {
     const foundUser = await db.users.where('email').equals(email).first();
     if (foundUser && foundUser.password === password && foundUser.isActive) {
@@ -47,6 +34,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null);
     localStorage.removeItem('edutech_user_id');
   }, []);
+
+  useEffect(() => {
+    setMounted(true);
+    const initAuth = async () => {
+      await seedDatabase();
+      const storedUserId = localStorage.getItem('edutech_user_id');
+      if (storedUserId) {
+        const user = await db.users.get(storedUserId);
+        if (user) {
+          setUser(user);
+        }
+      }
+      setIsLoading(false);
+    };
+    initAuth();
+  }, []);
+
+  // Now safe to do conditional rendering after all hooks
+  if (!mounted) {
+    return <div className="min-h-screen bg-gradient-to-br from-purple-600 via-pink-600 to-purple-600" />;
+  }
 
   return (
     <AuthContext.Provider
@@ -83,11 +91,10 @@ export function getRoleName(role: UserRole): string {
 
 export function getRoleColor(role: UserRole): string {
   const roleColors: Record<UserRole, string> = {
-    moe: 'bg-purple-500',
-    school_admin: 'bg-blue-500',
-    teacher: 'bg-emerald-500',
-    parent: 'bg-amber-500',
+    moe: 'bg-gradient-to-br from-purple-600 to-pink-600',
+    school_admin: 'bg-gradient-to-br from-blue-600 to-cyan-600',
+    teacher: 'bg-gradient-to-br from-emerald-600 to-teal-600',
+    parent: 'bg-gradient-to-br from-pink-600 to-rose-600',
   };
   return roleColors[role];
 }
-

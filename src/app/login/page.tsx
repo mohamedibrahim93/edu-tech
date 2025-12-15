@@ -2,10 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { School, Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import Link from 'next/link';
+import { School, Mail, Lock, Eye, EyeOff, ArrowRight, Sparkles } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -15,12 +14,17 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    if (!isLoading && isAuthenticated) {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (mounted && !isLoading && isAuthenticated) {
       router.push('/dashboard');
     }
-  }, [isAuthenticated, isLoading, router]);
+  }, [isAuthenticated, isLoading, router, mounted]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,136 +47,164 @@ export default function LoginPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-900">
-        <div className="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin" />
+          <p className="text-slate-600 font-medium">Loading...</p>
+        </div>
       </div>
     );
   }
 
   const demoAccounts = [
-    { role: 'MoE Admin', email: 'moe@edutech.gov', password: 'password123' },
-    { role: 'School Admin', email: 'admin@school1.edu', password: 'password123' },
-    { role: 'Teacher', email: 'teacher1@school1.edu', password: 'password123' },
-    { role: 'Parent', email: 'parent@example.com', password: 'password123' },
+    { role: 'MoE Admin', email: 'moe@edutech.gov', color: 'bg-purple-600' },
+    { role: 'School Admin', email: 'admin@school1.edu', color: 'bg-blue-600' },
+    { role: 'Teacher', email: 'teacher1@school1.edu', color: 'bg-emerald-600' },
+    { role: 'Parent', email: 'parent@example.com', color: 'bg-pink-600' },
   ];
 
   return (
-    <div className="min-h-screen flex">
-      {/* Left Panel - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=&quot;60&quot; height=&quot;60&quot; viewBox=&quot;0 0 60 60&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;%3E%3Cg fill=&quot;none&quot; fill-rule=&quot;evenodd&quot;%3E%3Cg fill=&quot;%23ffffff&quot; fill-opacity=&quot;0.05&quot;%3E%3Cpath d=&quot;M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z&quot;/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-50"></div>
-        <div className="relative z-10 flex flex-col justify-center px-12 text-white">
-          <div className="flex items-center gap-4 mb-8">
-            <div className="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-xl flex items-center justify-center">
-              <School className="w-10 h-10" />
+    <div className="min-h-screen bg-slate-50 flex">
+      {/* Left Side - Branding */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-purple-600 via-purple-700 to-pink-600 p-12 flex-col justify-between relative overflow-hidden">
+        {/* Decorative Elements */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-pink-500/20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+        
+        <div className="relative z-10">
+          <Link href="/" className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center">
+              <School className="w-7 h-7 text-white" />
             </div>
-            <div>
-              <h1 className="text-4xl font-bold">EduTech</h1>
-              <p className="text-white/80">Management System</p>
-            </div>
-          </div>
-          <h2 className="text-3xl font-bold mb-4">
-            Empowering Education Through Technology
-          </h2>
-          <p className="text-lg text-white/80 mb-8">
-            A comprehensive platform for managing schools, students, teachers, and parents. 
-            Streamline attendance tracking, communication, and reporting.
+            <span className="text-2xl font-bold text-white">EduTech</span>
+          </Link>
+        </div>
+
+        <div className="relative z-10">
+          <h1 className="text-4xl xl:text-5xl font-bold text-white mb-6 leading-tight">
+            Smart Education<br />Management Platform
+          </h1>
+          <p className="text-lg text-white/80 mb-8 max-w-md">
+            From Ministry of Education to classrooms. Manage schools, track attendance, and communicate with parents.
           </p>
-          <div className="grid grid-cols-2 gap-4">
-            {[
-              'Attendance Tracking',
-              'Real-time Reports',
-              'Parent Communication',
-              'School Management',
-            ].map((feature) => (
-              <div key={feature} className="flex items-center gap-2 text-sm">
-                <div className="w-2 h-2 rounded-full bg-white/80"></div>
+          <div className="flex flex-wrap gap-3">
+            {['QR Attendance', 'Multi-Level Access', 'Real-time Reports'].map((feature) => (
+              <span key={feature} className="px-4 py-2 bg-white/10 backdrop-blur rounded-full text-sm font-medium text-white">
                 {feature}
-              </div>
+              </span>
             ))}
           </div>
         </div>
+
+        <div className="relative z-10 text-white/60 text-sm">
+          © 2025 EduTech. All rights reserved.
+        </div>
       </div>
 
-      {/* Right Panel - Login Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center bg-slate-50 dark:bg-slate-900 p-8">
+      {/* Right Side - Login Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
         <div className="w-full max-w-md">
           {/* Mobile Logo */}
-          <div className="lg:hidden flex items-center justify-center gap-3 mb-8">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+          <div className="lg:hidden flex items-center justify-center gap-3 mb-10">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
               <School className="w-7 h-7 text-white" />
             </div>
-            <span className="text-2xl font-bold text-slate-900 dark:text-white">EduTech</span>
+            <span className="text-2xl font-bold text-slate-900">EduTech</span>
           </div>
 
-          <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-xl p-8 border border-slate-200 dark:border-slate-700">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Welcome Back</h2>
-              <p className="text-slate-500 dark:text-slate-400 mt-2">Sign in to your account</p>
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-slate-900 mb-2">Welcome back</h2>
+            <p className="text-slate-600">Sign in to your account to continue</p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                Email Address
+              </label>
+              <div className="relative">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email"
+                  className="w-full pl-12 pr-4 py-3 rounded-xl border border-slate-300 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 outline-none transition-all"
+                  required
+                />
+              </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <Input
-                label="Email"
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                icon={<Mail className="w-5 h-5" />}
-                required
-              />
-
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                Password
+              </label>
               <div className="relative">
-                <Input
-                  label="Password"
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                <input
                   type={showPassword ? 'text' : 'password'}
-                  placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  icon={<Lock className="w-5 h-5" />}
+                  placeholder="Enter your password"
+                  className="w-full pl-12 pr-12 py-3 rounded-xl border border-slate-300 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 outline-none transition-all"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-9 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
+            </div>
 
-              {error && (
-                <div className="p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
-                  <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
-                </div>
-              )}
-
-              <Button type="submit" className="w-full" size="lg" isLoading={isSubmitting}>
-                Sign In
-              </Button>
-            </form>
-
-            {/* Demo Accounts */}
-            <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-700">
-              <p className="text-sm text-slate-500 dark:text-slate-400 text-center mb-4">
-                Demo Accounts (click to fill)
-              </p>
-              <div className="grid grid-cols-2 gap-2">
-                {demoAccounts.map((account) => (
-                  <button
-                    key={account.email}
-                    onClick={() => {
-                      setEmail(account.email);
-                      setPassword(account.password);
-                    }}
-                    className="p-2 text-xs text-left rounded-lg border border-slate-200 dark:border-slate-700 hover:border-indigo-500 dark:hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors"
-                  >
-                    <span className="font-medium text-slate-900 dark:text-white">{account.role}</span>
-                    <br />
-                    <span className="text-slate-500 dark:text-slate-400">{account.email}</span>
-                  </button>
-                ))}
+            {error && (
+              <div className="p-4 rounded-xl bg-red-50 border border-red-200">
+                <p className="text-sm text-red-600 font-medium">{error}</p>
               </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full py-3 px-4 text-white font-semibold bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {isSubmitting ? (
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              ) : (
+                <>
+                  Sign In
+                  <ArrowRight className="w-5 h-5" />
+                </>
+              )}
+            </button>
+          </form>
+
+          {/* Demo Accounts */}
+          <div className="mt-8 pt-8 border-t border-slate-200">
+            <p className="text-sm text-slate-500 text-center mb-4 font-medium">
+              Quick Login (Demo Accounts)
+            </p>
+            <div className="grid grid-cols-2 gap-3">
+              {demoAccounts.map((account) => (
+                <button
+                  key={account.email}
+                  onClick={() => {
+                    setEmail(account.email);
+                    setPassword('password123');
+                  }}
+                  className="flex items-center gap-3 p-3 rounded-xl border border-slate-200 hover:border-purple-300 hover:bg-purple-50/50 transition-all text-left group"
+                >
+                  <div className={`w-10 h-10 rounded-lg ${account.color} flex items-center justify-center text-white font-bold text-sm group-hover:scale-110 transition-transform`}>
+                    {account.role.charAt(0)}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-slate-900 text-sm">{account.role}</p>
+                    <p className="text-xs text-slate-500 truncate">{account.email}</p>
+                  </div>
+                </button>
+              ))}
             </div>
           </div>
         </div>
@@ -180,4 +212,3 @@ export default function LoginPage() {
     </div>
   );
 }
-

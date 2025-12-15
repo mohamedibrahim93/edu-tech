@@ -260,7 +260,7 @@ export default function DashboardPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold text-slate-900 text-sm sm:text-base">{announcement.title}</p>
-                      <p className="text-sm text-slate-500 truncate">{announcement.message}</p>
+                      <p className="text-sm text-slate-500 truncate">{announcement.content}</p>
                       <p className="text-xs text-slate-400 mt-1">{format(new Date(announcement.createdAt), 'MMM d, yyyy')}</p>
                     </div>
                   </div>

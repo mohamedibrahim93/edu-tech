@@ -6,16 +6,19 @@ interface CardProps {
   children: React.ReactNode;
   className?: string;
   hover?: boolean;
+  onClick?: () => void;
 }
 
-export function Card({ children, className = '', hover = false }: CardProps) {
+export function Card({ children, className = '', hover = false, onClick }: CardProps) {
   return (
     <div
       className={`
         bg-white rounded-2xl border border-slate-200/60 shadow-sm shadow-slate-200/50
         ${hover ? 'hover:shadow-lg hover:shadow-slate-200/80 hover:-translate-y-1 hover:border-purple-200/50 transition-all duration-300 cursor-pointer' : ''}
+        ${onClick ? 'cursor-pointer' : ''}
         ${className}
       `}
+      onClick={onClick}
     >
       {children}
     </div>

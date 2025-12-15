@@ -94,7 +94,12 @@ export default function ParentsPage() {
 
     if (editingParent) {
       await db.users.update(userId, userData);
-      await db.parents.update(parentId, parentData);
+      await db.parents.update(parentId, {
+        userId: parentData.userId,
+        studentIds: parentData.studentIds,
+        isApproved: parentData.isApproved,
+        createdAt: parentData.createdAt,
+      });
     } else {
       await db.users.add(userData);
       await db.parents.add(parentData);

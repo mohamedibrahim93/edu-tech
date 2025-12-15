@@ -102,7 +102,14 @@ export default function TeachersPage() {
 
     if (editingTeacher) {
       await db.users.update(userId, userData);
-      await db.teachers.update(teacherId, teacherData);
+      await db.teachers.update(teacherId, {
+        userId: teacherData.userId,
+        schoolId: teacherData.schoolId,
+        subjects: teacherData.subjects,
+        isSupervisor: teacherData.isSupervisor,
+        createdAt: teacherData.createdAt,
+        isActive: teacherData.isActive,
+      });
     } else {
       await db.users.add(userData);
       await db.teachers.add(teacherData);

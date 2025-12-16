@@ -171,7 +171,7 @@ export default function ReportsPage() {
   return (
     <DashboardLayout title="Reports" subtitle="View attendance and performance reports">
       {/* Controls */}
-      <Card className="mb-6">
+      <Card className="mb-6 p-4 sm:p-6">
         <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
           <div className="flex items-center gap-4">
             <Select
@@ -194,27 +194,27 @@ export default function ReportsPage() {
 
       {/* Overall Stats */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-        <Card className="text-center">
-          <BarChart3 className="w-8 h-8 mx-auto text-indigo-500 mb-2" />
-          <p className="text-2xl font-bold text-indigo-600">{overallAttendanceRate}%</p>
+        <Card className="text-center p-4 sm:p-6">
+          <BarChart3 className="w-8 h-8 mx-auto text-purple-500 mb-2" />
+          <p className="text-2xl font-bold text-purple-600">{overallAttendanceRate}%</p>
           <p className="text-sm text-slate-500">Attendance Rate</p>
         </Card>
-        <Card className="text-center">
+        <Card className="text-center p-4 sm:p-6">
           <CheckCircle className="w-8 h-8 mx-auto text-emerald-500 mb-2" />
           <p className="text-2xl font-bold text-emerald-600">{overallStats.present}</p>
           <p className="text-sm text-slate-500">Present</p>
         </Card>
-        <Card className="text-center">
+        <Card className="text-center p-4 sm:p-6">
           <XCircle className="w-8 h-8 mx-auto text-red-500 mb-2" />
           <p className="text-2xl font-bold text-red-600">{overallStats.absent}</p>
           <p className="text-sm text-slate-500">Absent</p>
         </Card>
-        <Card className="text-center">
+        <Card className="text-center p-4 sm:p-6">
           <Clock className="w-8 h-8 mx-auto text-amber-500 mb-2" />
           <p className="text-2xl font-bold text-amber-600">{overallStats.late}</p>
           <p className="text-sm text-slate-500">Late</p>
         </Card>
-        <Card className="text-center">
+        <Card className="text-center p-4 sm:p-6">
           <Calendar className="w-8 h-8 mx-auto text-blue-500 mb-2" />
           <p className="text-2xl font-bold text-blue-600">{overallStats.excused}</p>
           <p className="text-sm text-slate-500">Excused</p>
@@ -225,12 +225,12 @@ export default function ReportsPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         <Card>
           <CardHeader title="Total Students" />
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+          <div className="flex items-center gap-4 px-4 sm:px-6 pb-4 sm:pb-6">
+            <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center">
               <GraduationCap className="w-8 h-8 text-white" />
             </div>
             <div>
-              <p className="text-3xl font-bold text-slate-900 dark:text-white">{students.length}</p>
+              <p className="text-3xl font-bold text-slate-900">{students.length}</p>
               <p className="text-sm text-slate-500">Enrolled students</p>
             </div>
           </div>
@@ -238,12 +238,12 @@ export default function ReportsPage() {
         
         <Card>
           <CardHeader title="Total Teachers" />
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 px-4 sm:px-6 pb-4 sm:pb-6">
             <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
               <Users className="w-8 h-8 text-white" />
             </div>
             <div>
-              <p className="text-3xl font-bold text-slate-900 dark:text-white">{teachers.length}</p>
+              <p className="text-3xl font-bold text-slate-900">{teachers.length}</p>
               <p className="text-sm text-slate-500">Active teachers</p>
             </div>
           </div>
@@ -251,12 +251,12 @@ export default function ReportsPage() {
         
         <Card>
           <CardHeader title="Total Classes" />
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 px-4 sm:px-6 pb-4 sm:pb-6">
             <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center">
               <FileText className="w-8 h-8 text-white" />
             </div>
             <div>
-              <p className="text-3xl font-bold text-slate-900 dark:text-white">{classes.length}</p>
+              <p className="text-3xl font-bold text-slate-900">{classes.length}</p>
               <p className="text-sm text-slate-500">Active classes</p>
             </div>
           </div>
@@ -266,11 +266,11 @@ export default function ReportsPage() {
       {/* Class Reports */}
       <Card>
         <CardHeader title="Class Attendance Report" subtitle="Performance by class" />
-        <div className="space-y-4">
+        <div className="space-y-4 px-4 sm:px-6 pb-4 sm:pb-6">
           {classReports.map((report, index) => (
             <div
               key={report.classId}
-              className="flex items-center gap-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-700/50"
+              className="flex items-center gap-4 p-4 rounded-xl bg-slate-50"
             >
               <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-white ${
                 index === 0 ? 'bg-amber-500' :
@@ -282,7 +282,7 @@ export default function ReportsPage() {
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-2">
-                  <h4 className="font-medium text-slate-900 dark:text-white">{report.className}</h4>
+                  <h4 className="font-medium text-slate-900">{report.className}</h4>
                   <div className="flex items-center gap-2">
                     {report.attendanceRate >= 90 ? (
                       <TrendingUp className="w-4 h-4 text-emerald-500" />
@@ -298,7 +298,7 @@ export default function ReportsPage() {
                     </span>
                   </div>
                 </div>
-                <div className="w-full h-2 bg-slate-200 dark:bg-slate-600 rounded-full overflow-hidden">
+                <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
                   <div 
                     className={`h-full rounded-full transition-all ${
                       report.attendanceRate >= 90 ? 'bg-emerald-500' :

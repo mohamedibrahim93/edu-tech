@@ -134,10 +134,10 @@ export default function AnnouncementsPage() {
 
   const getTypeColor = (type: string) => {
     switch (type) {
-      case 'alert': return 'bg-red-100 text-red-600 dark:bg-red-900/30';
-      case 'instruction': return 'bg-blue-100 text-blue-600 dark:bg-blue-900/30';
-      case 'evacuation': return 'bg-purple-100 text-purple-600 dark:bg-purple-900/30';
-      default: return 'bg-slate-100 text-slate-600 dark:bg-slate-700';
+      case 'alert': return 'bg-red-100 text-red-600';
+      case 'instruction': return 'bg-blue-100 text-blue-600';
+      case 'evacuation': return 'bg-purple-100 text-purple-600';
+      default: return 'bg-slate-100 text-slate-600';
     }
   };
 
@@ -155,7 +155,7 @@ export default function AnnouncementsPage() {
 
   return (
     <DashboardLayout title="Announcements" subtitle="View and manage announcements">
-      <Card className="mb-6">
+      <Card className="mb-6 p-4 sm:p-6">
         <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
           <div className="flex gap-4">
             <Select
@@ -194,16 +194,16 @@ export default function AnnouncementsPage() {
 
       <div className="space-y-4">
         {filteredAnnouncements.length === 0 ? (
-          <Card>
+          <Card className="p-4 sm:p-6">
             <div className="text-center py-12">
               <Bell className="w-12 h-12 mx-auto text-slate-400 mb-4" />
-              <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-2">No Announcements</h3>
+              <h3 className="text-lg font-medium text-slate-900 mb-2">No Announcements</h3>
               <p className="text-slate-500">There are no announcements to display.</p>
             </div>
           </Card>
         ) : (
           filteredAnnouncements.map((announcement) => (
-            <Card key={announcement.id} className={`
+            <Card key={announcement.id} className={`p-4 sm:p-6
               ${announcement.priority === 'urgent' ? 'border-l-4 border-l-red-500' : ''}
               ${announcement.priority === 'high' ? 'border-l-4 border-l-amber-500' : ''}
             `}>
@@ -214,7 +214,7 @@ export default function AnnouncementsPage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-4">
                     <div>
-                      <h3 className="font-semibold text-lg text-slate-900 dark:text-white">{announcement.title}</h3>
+                      <h3 className="font-semibold text-lg text-slate-900">{announcement.title}</h3>
                       <div className="flex items-center gap-3 mt-1 text-sm text-slate-500">
                         <span>{announcement.author?.name || 'Unknown'}</span>
                         <span>•</span>
@@ -228,7 +228,7 @@ export default function AnnouncementsPage() {
                       <Badge variant="default">{announcement.type}</Badge>
                     </div>
                   </div>
-                  <p className="mt-3 text-slate-600 dark:text-slate-300">{announcement.content}</p>
+                  <p className="mt-3 text-slate-600">{announcement.content}</p>
                   
                   {canEdit(announcement) && (
                     <div className="flex gap-2 mt-4">
@@ -269,14 +269,14 @@ export default function AnnouncementsPage() {
             required
           />
           <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Content</label>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">Content</label>
             <textarea
               value={formData.content}
               onChange={(e) => setFormData({ ...formData, content: e.target.value })}
               placeholder="Enter announcement content"
               rows={4}
               required
-              className="w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-4 py-2.5 text-slate-900 dark:text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all duration-200"
             />
           </div>
           <div className="grid grid-cols-2 gap-4">

@@ -102,7 +102,7 @@ export default function SettingsPage() {
     <DashboardLayout title="Settings" subtitle="Manage your account settings">
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Sidebar */}
-        <Card className="lg:col-span-1 h-fit">
+        <Card className="lg:col-span-1 h-fit p-4">
           <div className="space-y-1">
             {tabs.map((tab) => (
               <button
@@ -110,8 +110,8 @@ export default function SettingsPage() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-colors ${
                   activeTab === tab.id
-                    ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400'
-                    : 'hover:bg-slate-50 dark:hover:bg-slate-700/50 text-slate-700 dark:text-slate-300'
+                    ? 'bg-purple-50 text-purple-600'
+                    : 'hover:bg-slate-50 text-slate-700'
                 }`}
               >
                 <tab.icon className="w-5 h-5" />
@@ -126,8 +126,8 @@ export default function SettingsPage() {
           {message && (
             <div className={`p-4 rounded-xl flex items-center gap-3 ${
               message.type === 'success' 
-                ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600' 
-                : 'bg-red-50 dark:bg-red-900/20 text-red-600'
+                ? 'bg-emerald-50 text-emerald-600' 
+                : 'bg-red-50 text-red-600'
             }`}>
               {message.type === 'success' ? (
                 <Check className="w-5 h-5" />
@@ -143,17 +143,17 @@ export default function SettingsPage() {
               <CardHeader title="Profile Information" subtitle="Update your personal information" />
               
               {/* User Info Display */}
-              <div className="flex items-center gap-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-700/50 mb-6">
+              <div className="flex items-center gap-4 p-4 rounded-xl bg-slate-50 mx-4 sm:mx-6 mb-6">
                 <div className={`w-16 h-16 rounded-full ${getRoleColor(user?.role || 'parent')} flex items-center justify-center text-white text-2xl font-bold`}>
                   {user?.name?.charAt(0) || 'U'}
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{user?.name}</h3>
+                  <h3 className="text-lg font-semibold text-slate-900">{user?.name}</h3>
                   <p className="text-sm text-slate-500">{getRoleName(user?.role || 'parent')}</p>
                 </div>
               </div>
               
-              <form onSubmit={handleProfileUpdate} className="space-y-4">
+              <form onSubmit={handleProfileUpdate} className="space-y-4 px-4 sm:px-6 pb-4 sm:pb-6">
                 <Input
                   label="Full Name"
                   value={profileData.name}
@@ -180,7 +180,7 @@ export default function SettingsPage() {
             <Card>
               <CardHeader title="Change Password" subtitle="Update your password to keep your account secure" />
               
-              <form onSubmit={handlePasswordChange} className="space-y-4">
+              <form onSubmit={handlePasswordChange} className="space-y-4 px-4 sm:px-6 pb-4 sm:pb-6">
                 <Input
                   label="Current Password"
                   type="password"
@@ -215,7 +215,7 @@ export default function SettingsPage() {
             <Card>
               <CardHeader title="Notification Preferences" subtitle="Manage how you receive notifications" />
               
-              <div className="space-y-4">
+              <div className="space-y-4 px-4 sm:px-6">
                 {[
                   { id: 'email_announcements', label: 'Email Announcements', description: 'Receive announcements via email' },
                   { id: 'email_alerts', label: 'Urgent Alerts', description: 'Receive urgent alerts via email' },
@@ -224,22 +224,22 @@ export default function SettingsPage() {
                 ].map((setting) => (
                   <label
                     key={setting.id}
-                    className="flex items-center justify-between p-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-indigo-500 dark:hover:border-indigo-500 cursor-pointer transition-colors"
+                    className="flex items-center justify-between p-4 rounded-xl border border-slate-200 hover:border-purple-500 cursor-pointer transition-colors"
                   >
                     <div>
-                      <p className="font-medium text-slate-900 dark:text-white">{setting.label}</p>
+                      <p className="font-medium text-slate-900">{setting.label}</p>
                       <p className="text-sm text-slate-500">{setting.description}</p>
                     </div>
                     <input
                       type="checkbox"
                       defaultChecked
-                      className="w-5 h-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                      className="w-5 h-5 rounded border-slate-300 text-purple-600 focus:ring-purple-500"
                     />
                   </label>
                 ))}
               </div>
               
-              <div className="flex justify-end mt-6">
+              <div className="flex justify-end px-4 sm:px-6 py-4 sm:pb-6">
                 <Button onClick={() => setMessage({ type: 'success', text: 'Preferences saved!' })}>
                   Save Preferences
                 </Button>
@@ -248,12 +248,12 @@ export default function SettingsPage() {
           )}
 
           {/* Danger Zone */}
-          <Card className="border-red-200 dark:border-red-800">
+          <Card className="border-red-200">
             <CardHeader title="Danger Zone" subtitle="Irreversible actions" />
-            <div className="flex items-center justify-between p-4 rounded-xl bg-red-50 dark:bg-red-900/20">
+            <div className="flex items-center justify-between p-4 rounded-xl bg-red-50 mx-4 sm:mx-6 mb-4 sm:mb-6">
               <div>
-                <p className="font-medium text-red-700 dark:text-red-400">Sign Out</p>
-                <p className="text-sm text-red-600/70 dark:text-red-400/70">Sign out from your account</p>
+                <p className="font-medium text-red-700">Sign Out</p>
+                <p className="text-sm text-red-600/70">Sign out from your account</p>
               </div>
               <Button variant="danger" onClick={logout}>
                 Sign Out

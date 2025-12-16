@@ -117,10 +117,10 @@ export default function IssuesPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'open': return 'bg-red-100 text-red-600 dark:bg-red-900/30';
-      case 'in_progress': return 'bg-amber-100 text-amber-600 dark:bg-amber-900/30';
-      case 'resolved': return 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30';
-      case 'closed': return 'bg-slate-100 text-slate-600 dark:bg-slate-700';
+      case 'open': return 'bg-red-100 text-red-600';
+      case 'in_progress': return 'bg-amber-100 text-amber-600';
+      case 'resolved': return 'bg-emerald-100 text-emerald-600';
+      case 'closed': return 'bg-slate-100 text-slate-600';
       default: return 'bg-slate-100 text-slate-600';
     }
   };
@@ -153,7 +153,7 @@ export default function IssuesPage() {
           <Card>
             <div className="text-center py-12">
               <MessageSquare className="w-12 h-12 mx-auto text-slate-400 mb-4" />
-              <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-2">No Issues Found</h3>
+              <h3 className="text-lg font-medium text-slate-900 mb-2">No Issues Found</h3>
               <p className="text-slate-500">There are no issues to display.</p>
             </div>
           </Card>
@@ -174,7 +174,7 @@ export default function IssuesPage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-4">
                     <div>
-                      <h3 className="font-semibold text-slate-900 dark:text-white">{issue.subject}</h3>
+                      <h3 className="font-semibold text-slate-900">{issue.subject}</h3>
                       <div className="flex items-center gap-3 mt-1 text-sm text-slate-500">
                         <span>{issue.reporter?.name || 'Unknown'}</span>
                         <span>•</span>
@@ -185,7 +185,7 @@ export default function IssuesPage() {
                     </div>
                     {getStatusBadge(issue.status)}
                   </div>
-                  <p className="mt-2 text-sm text-slate-600 dark:text-slate-400 line-clamp-2">
+                  <p className="mt-2 text-sm text-slate-600 line-clamp-2">
                     {issue.description}
                   </p>
                 </div>
@@ -213,14 +213,14 @@ export default function IssuesPage() {
             required
           />
           <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Description</label>
+            <label className="block text-sm font-semibold text-slate-700 mb-2">Description</label>
             <textarea
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="Provide more details about the issue"
               rows={4}
               required
-              className="w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-4 py-2.5 text-slate-900 dark:text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all duration-200"
             />
           </div>
           <div className="flex justify-end gap-3 pt-4">
@@ -248,7 +248,7 @@ export default function IssuesPage() {
                 {getStatusIcon(viewingIssue.status)}
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold text-lg text-slate-900 dark:text-white">{viewingIssue.subject}</h3>
+                <h3 className="font-semibold text-lg text-slate-900">{viewingIssue.subject}</h3>
                 <div className="flex items-center gap-3 mt-1 text-sm text-slate-500">
                   <span>{viewingIssue.reporter?.name}</span>
                   <span>•</span>
@@ -260,14 +260,14 @@ export default function IssuesPage() {
               {getStatusBadge(viewingIssue.status)}
             </div>
             
-            <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-700/50">
-              <h4 className="font-medium text-slate-700 dark:text-slate-300 mb-2">Description</h4>
-              <p className="text-slate-600 dark:text-slate-400 whitespace-pre-wrap">{viewingIssue.description}</p>
+            <div className="p-4 rounded-xl bg-slate-50">
+              <h4 className="font-medium text-slate-700 mb-2">Description</h4>
+              <p className="text-slate-600 whitespace-pre-wrap">{viewingIssue.description}</p>
             </div>
             
             {user?.role === 'school_admin' && (
-              <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
-                <h4 className="font-medium text-slate-700 dark:text-slate-300 mb-3">Update Status</h4>
+              <div className="pt-4 border-t border-slate-200">
+                <h4 className="font-medium text-slate-700 mb-3">Update Status</h4>
                 <div className="flex flex-wrap gap-2">
                   {(['open', 'in_progress', 'resolved', 'closed'] as Issue['status'][]).map((status) => (
                     <Button

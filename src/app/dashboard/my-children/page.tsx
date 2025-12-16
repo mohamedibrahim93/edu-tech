@@ -99,7 +99,7 @@ export default function MyChildrenPage() {
   if (user?.role !== 'parent') {
     return (
       <DashboardLayout title="My Children" subtitle="View your children's information">
-        <Card>
+        <Card className="p-4 sm:p-6">
           <div className="text-center py-12">
             <GraduationCap className="w-12 h-12 mx-auto text-slate-400 mb-4" />
             <p className="text-slate-500">This page is only available for parents.</p>
@@ -127,7 +127,7 @@ export default function MyChildrenPage() {
           <Card
             key={child.id}
             hover
-            className={`min-w-[200px] cursor-pointer ${selectedChild?.id === child.id ? 'ring-2 ring-indigo-500' : ''}`}
+            className={`min-w-[200px] cursor-pointer p-4 ${selectedChild?.id === child.id ? 'ring-2 ring-purple-500' : ''}`}
             onClick={() => setSelectedChild(child)}
           >
             <div className="flex items-center gap-3">
@@ -135,7 +135,7 @@ export default function MyChildrenPage() {
                 {child.name.charAt(0)}
               </div>
               <div>
-                <p className="font-medium text-slate-900 dark:text-white">{child.name}</p>
+                <p className="font-medium text-slate-900">{child.name}</p>
                 <p className="text-sm text-slate-500">{child.class?.name}</p>
               </div>
             </div>
@@ -149,31 +149,31 @@ export default function MyChildrenPage() {
           <Card className="lg:col-span-2">
             <CardHeader title={selectedChild.name} subtitle={`Student Number: ${selectedChild.studentNumber}`} />
             
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-700/50 text-center">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 px-4 sm:px-6">
+              <div className="p-4 rounded-xl bg-slate-50 text-center">
                 <p className="text-sm text-slate-500 mb-1">Class</p>
-                <p className="font-semibold text-slate-900 dark:text-white">{selectedChild.class?.name}</p>
+                <p className="font-semibold text-slate-900">{selectedChild.class?.name}</p>
               </div>
-              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-700/50 text-center">
+              <div className="p-4 rounded-xl bg-slate-50 text-center">
                 <p className="text-sm text-slate-500 mb-1">Grade</p>
-                <p className="font-semibold text-slate-900 dark:text-white">{selectedChild.class?.grade}</p>
+                <p className="font-semibold text-slate-900">{selectedChild.class?.grade}</p>
               </div>
-              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-700/50 text-center">
+              <div className="p-4 rounded-xl bg-slate-50 text-center">
                 <p className="text-sm text-slate-500 mb-1">Date of Birth</p>
-                <p className="font-semibold text-slate-900 dark:text-white">
+                <p className="font-semibold text-slate-900">
                   {format(new Date(selectedChild.dateOfBirth), 'MMM d, yyyy')}
                 </p>
               </div>
-              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-700/50 text-center">
+              <div className="p-4 rounded-xl bg-slate-50 text-center">
                 <p className="text-sm text-slate-500 mb-1">Gender</p>
-                <p className="font-semibold text-slate-900 dark:text-white capitalize">{selectedChild.gender}</p>
+                <p className="font-semibold text-slate-900 capitalize">{selectedChild.gender}</p>
               </div>
             </div>
 
             {/* Attendance Stats */}
-            <h4 className="font-medium text-slate-900 dark:text-white mb-4">Attendance (Last 30 Days)</h4>
-            <div className="grid grid-cols-5 gap-4 mb-6">
-              <div className="p-4 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 text-center">
+            <h4 className="font-medium text-slate-900 mb-4 px-4 sm:px-6">Attendance (Last 30 Days)</h4>
+            <div className="grid grid-cols-5 gap-4 mb-6 px-4 sm:px-6">
+              <div className="p-4 rounded-xl bg-purple-50 text-center">
                 <div className="flex items-center justify-center gap-1 mb-1">
                   {selectedChild.attendanceStats.rate >= 90 ? (
                     <TrendingUp className="w-4 h-4 text-emerald-500" />
@@ -181,25 +181,25 @@ export default function MyChildrenPage() {
                     <TrendingDown className="w-4 h-4 text-red-500" />
                   )}
                 </div>
-                <p className="text-2xl font-bold text-indigo-600">{selectedChild.attendanceStats.rate}%</p>
-                <p className="text-xs text-indigo-600/70">Rate</p>
+                <p className="text-2xl font-bold text-purple-600">{selectedChild.attendanceStats.rate}%</p>
+                <p className="text-xs text-purple-600/70">Rate</p>
               </div>
-              <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 text-center">
+              <div className="p-4 rounded-xl bg-emerald-50 text-center">
                 <CheckCircle className="w-5 h-5 mx-auto text-emerald-500 mb-1" />
                 <p className="text-xl font-bold text-emerald-600">{selectedChild.attendanceStats.present}</p>
                 <p className="text-xs text-emerald-600/70">Present</p>
               </div>
-              <div className="p-4 rounded-xl bg-red-50 dark:bg-red-900/20 text-center">
+              <div className="p-4 rounded-xl bg-red-50 text-center">
                 <XCircle className="w-5 h-5 mx-auto text-red-500 mb-1" />
                 <p className="text-xl font-bold text-red-600">{selectedChild.attendanceStats.absent}</p>
                 <p className="text-xs text-red-600/70">Absent</p>
               </div>
-              <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-900/20 text-center">
+              <div className="p-4 rounded-xl bg-amber-50 text-center">
                 <Clock className="w-5 h-5 mx-auto text-amber-500 mb-1" />
                 <p className="text-xl font-bold text-amber-600">{selectedChild.attendanceStats.late}</p>
                 <p className="text-xs text-amber-600/70">Late</p>
               </div>
-              <div className="p-4 rounded-xl bg-blue-50 dark:bg-blue-900/20 text-center">
+              <div className="p-4 rounded-xl bg-blue-50 text-center">
                 <Calendar className="w-5 h-5 mx-auto text-blue-500 mb-1" />
                 <p className="text-xl font-bold text-blue-600">{selectedChild.attendanceStats.excused}</p>
                 <p className="text-xs text-blue-600/70">Excused</p>
@@ -207,12 +207,12 @@ export default function MyChildrenPage() {
             </div>
 
             {/* Recent Attendance */}
-            <h4 className="font-medium text-slate-900 dark:text-white mb-4">Recent Attendance</h4>
-            <div className="flex gap-2 flex-wrap">
+            <h4 className="font-medium text-slate-900 mb-4 px-4 sm:px-6">Recent Attendance</h4>
+            <div className="flex gap-2 flex-wrap px-4 sm:px-6 pb-4 sm:pb-6">
               {selectedChild.recentAttendance.map((record) => (
                 <div
                   key={record.id}
-                  className="flex flex-col items-center p-3 rounded-lg bg-slate-50 dark:bg-slate-700/50"
+                  className="flex flex-col items-center p-3 rounded-lg bg-slate-50"
                   title={`${format(new Date(record.date), 'MMM d')} - ${record.status}`}
                 >
                   {getStatusIcon(record.status)}
@@ -230,14 +230,14 @@ export default function MyChildrenPage() {
           {/* Announcements */}
           <Card>
             <CardHeader title="School Announcements" subtitle="Recent updates" />
-            <div className="space-y-3">
+            <div className="space-y-3 px-4 sm:px-6 pb-4 sm:pb-6">
               {announcements.length === 0 ? (
                 <p className="text-slate-500 text-sm text-center py-4">No announcements</p>
               ) : (
                 announcements.map((announcement) => (
                   <div
                     key={announcement.id}
-                    className="p-3 rounded-xl bg-slate-50 dark:bg-slate-700/50"
+                    className="p-3 rounded-xl bg-slate-50"
                   >
                     <div className="flex items-center gap-2 mb-1">
                       <Bell className={`w-4 h-4 ${
@@ -245,7 +245,7 @@ export default function MyChildrenPage() {
                         announcement.priority === 'high' ? 'text-amber-500' :
                         'text-blue-500'
                       }`} />
-                      <span className="font-medium text-sm text-slate-900 dark:text-white">
+                      <span className="font-medium text-sm text-slate-900">
                         {announcement.title}
                       </span>
                     </div>
@@ -262,10 +262,10 @@ export default function MyChildrenPage() {
       )}
 
       {children.length === 0 && (
-        <Card>
+        <Card className="p-4 sm:p-6">
           <div className="text-center py-12">
             <GraduationCap className="w-12 h-12 mx-auto text-slate-400 mb-4" />
-            <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-2">No Children Found</h3>
+            <h3 className="text-lg font-medium text-slate-900 mb-2">No Children Found</h3>
             <p className="text-slate-500">Your account is not linked to any students yet.</p>
           </div>
         </Card>

@@ -136,12 +136,12 @@ export default function SchedulesPage() {
 
   const getSubjectColor = (subjectId: string) => {
     const colors = [
-      'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-      'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
-      'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
-      'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
-      'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400',
-      'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400',
+      'bg-blue-100 text-blue-700',
+      'bg-purple-100 text-purple-700',
+      'bg-emerald-100 text-emerald-700',
+      'bg-amber-100 text-amber-700',
+      'bg-pink-100 text-pink-700',
+      'bg-cyan-100 text-cyan-700',
     ];
     const index = subjects.findIndex(s => s.id === subjectId);
     return colors[index % colors.length];
@@ -149,7 +149,7 @@ export default function SchedulesPage() {
 
   return (
     <DashboardLayout title="Schedules" subtitle="Manage class schedules">
-      <Card className="mb-6">
+      <Card className="mb-6 p-4 sm:p-6">
         <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
           <Select
             value={selectedClass}
@@ -174,7 +174,7 @@ export default function SchedulesPage() {
         {schedulesByDay.filter(d => d.dayIndex >= 0 && d.dayIndex <= 4).map(({ day, dayIndex, schedules: daySchedules }) => (
           <Card key={day}>
             <CardHeader title={day} subtitle={`${daySchedules.length} classes`} />
-            <div className="space-y-2">
+            <div className="space-y-2 px-4 sm:px-6 pb-4 sm:pb-6">
               {daySchedules.length === 0 ? (
                 <p className="text-sm text-slate-500 text-center py-4">No classes</p>
               ) : (
@@ -213,7 +213,7 @@ export default function SchedulesPage() {
       {/* Subjects Legend */}
       <Card className="mt-6">
         <CardHeader title="Subjects" subtitle="Color legend" />
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 px-4 sm:px-6 pb-4 sm:pb-6">
           {subjects.map((subject) => (
             <div
               key={subject.id}

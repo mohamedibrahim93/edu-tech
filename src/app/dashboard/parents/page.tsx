@@ -159,7 +159,7 @@ export default function ParentsPage() {
             {parent.user?.name.charAt(0) || 'P'}
           </div>
           <div>
-            <p className="font-medium text-slate-900 dark:text-white">{parent.user?.name}</p>
+            <p className="font-medium text-slate-900">{parent.user?.name}</p>
             <p className="text-sm text-slate-500">{parent.user?.email}</p>
           </div>
         </div>
@@ -201,7 +201,7 @@ export default function ParentsPage() {
           {!parent.isApproved && (
             <button
               onClick={() => handleApprove(parent)}
-              className="p-2 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-lg transition-colors"
+              className="p-2 hover:bg-emerald-50 rounded-lg transition-colors"
               title="Approve"
             >
               <Check className="w-4 h-4 text-emerald-500" />
@@ -209,13 +209,13 @@ export default function ParentsPage() {
           )}
           <button
             onClick={() => handleEdit(parent)}
-            className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+            className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
           >
-            <Edit className="w-4 h-4 text-slate-600 dark:text-slate-400" />
+            <Edit className="w-4 h-4 text-slate-600" />
           </button>
           <button
             onClick={() => handleDelete(parent)}
-            className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+            className="p-2 hover:bg-red-50 rounded-lg transition-colors"
           >
             <Trash2 className="w-4 h-4 text-red-500" />
           </button>
@@ -227,7 +227,7 @@ export default function ParentsPage() {
   if (user?.role !== 'school_admin') {
     return (
       <DashboardLayout title="Parents" subtitle="Manage parent accounts">
-        <Card>
+        <Card className="p-4 sm:p-6">
           <div className="text-center py-12">
             <Users className="w-12 h-12 mx-auto text-slate-400 mb-4" />
             <p className="text-slate-500">You don't have permission to view this page.</p>
@@ -239,7 +239,7 @@ export default function ParentsPage() {
 
   return (
     <DashboardLayout title="Parents" subtitle="Manage parent accounts and approvals">
-      <Card>
+      <Card className="p-4 sm:p-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -248,7 +248,7 @@ export default function ParentsPage() {
               placeholder="Search parents..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:outline-none focus:border-indigo-500"
+              className="w-full pl-10 pr-4 py-2 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all"
             />
           </div>
           <Button onClick={() => setIsModalOpen(true)}>
@@ -299,30 +299,30 @@ export default function ParentsPage() {
           />
           
           <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+            <label className="block text-sm font-semibold text-slate-700 mb-2">
               Link Children
             </label>
-            <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-3 rounded-xl border border-slate-200 dark:border-slate-700">
+            <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-3 rounded-xl border border-slate-200">
               {allStudents.map((student) => (
                 <label
                   key={student.id}
                   className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-colors ${
                     formData.studentIds.includes(student.id)
-                      ? 'bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800'
-                      : 'hover:bg-slate-50 dark:hover:bg-slate-700/50'
+                      ? 'bg-purple-50 border border-purple-200'
+                      : 'hover:bg-slate-50'
                   }`}
                 >
                   <input
                     type="checkbox"
                     checked={formData.studentIds.includes(student.id)}
                     onChange={() => toggleStudent(student.id)}
-                    className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                    className="w-4 h-4 rounded border-slate-300 text-purple-600 focus:ring-purple-500"
                   />
                   <div className="flex items-center gap-2">
                     <div className={`w-6 h-6 rounded-full flex items-center justify-center text-white text-xs ${student.gender === 'male' ? 'bg-blue-500' : 'bg-pink-500'}`}>
                       {student.name.charAt(0)}
                     </div>
-                    <span className="text-sm text-slate-700 dark:text-slate-300">{student.name}</span>
+                    <span className="text-sm text-slate-700">{student.name}</span>
                   </div>
                 </label>
               ))}

@@ -25,32 +25,32 @@ export function StatsCard({
   const colorClasses = {
     purple: {
       gradient: 'from-purple-600 to-pink-600',
-      bg: 'bg-purple-50 dark:bg-purple-900/20',
-      text: 'text-purple-600 dark:text-purple-400',
+      bg: 'bg-purple-50',
+      text: 'text-purple-600',
       glow: 'shadow-purple-500/20',
     },
     blue: {
       gradient: 'from-blue-600 to-cyan-600',
-      bg: 'bg-blue-50 dark:bg-blue-900/20',
-      text: 'text-blue-600 dark:text-blue-400',
+      bg: 'bg-blue-50',
+      text: 'text-blue-600',
       glow: 'shadow-blue-500/20',
     },
     emerald: {
       gradient: 'from-emerald-600 to-teal-600',
-      bg: 'bg-emerald-50 dark:bg-emerald-900/20',
-      text: 'text-emerald-600 dark:text-emerald-400',
+      bg: 'bg-emerald-50',
+      text: 'text-emerald-600',
       glow: 'shadow-emerald-500/20',
     },
     pink: {
       gradient: 'from-pink-600 to-rose-600',
-      bg: 'bg-pink-50 dark:bg-pink-900/20',
-      text: 'text-pink-600 dark:text-pink-400',
+      bg: 'bg-pink-50',
+      text: 'text-pink-600',
       glow: 'shadow-pink-500/20',
     },
     amber: {
       gradient: 'from-amber-600 to-orange-600',
-      bg: 'bg-amber-50 dark:bg-amber-900/20',
-      text: 'text-amber-600 dark:text-amber-400',
+      bg: 'bg-amber-50',
+      text: 'text-amber-600',
       glow: 'shadow-amber-500/20',
     },
   };
@@ -59,7 +59,7 @@ export function StatsCard({
 
   return (
     <div
-      className="group relative overflow-hidden rounded-2xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl border border-slate-200/50 dark:border-slate-700/50 p-6 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 animate-slide-up opacity-0 [animation-fill-mode:forwards]"
+      className="group relative overflow-hidden rounded-2xl bg-white border border-slate-200/50 p-6 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 animate-slide-up opacity-0 [animation-fill-mode:forwards]"
       style={{ animationDelay: `${delay}ms` }}
     >
       {/* Background gradient */}
@@ -82,10 +82,10 @@ export function StatsCard({
         </div>
         
         <div>
-          <p className="text-3xl font-bold text-slate-900 dark:text-white mb-1 tracking-tight">
+          <p className="text-3xl font-bold text-slate-900 mb-1 tracking-tight">
             {value}
           </p>
-          <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+          <p className="text-sm font-medium text-slate-500">
             {title}
           </p>
         </div>

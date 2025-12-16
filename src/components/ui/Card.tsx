@@ -54,7 +54,7 @@ export function CardHeader({ title, subtitle, action, icon }: CardHeaderProps) {
 }
 
 export function CardContent({ children, className = '' }: { children: React.ReactNode; className?: string }) {
-  return <div className={className}>{children}</div>;
+  return <div className={`p-4 sm:p-6 ${className}`}>{children}</div>;
 }
 
 export function CardFooter({ children, className = '' }: { children: React.ReactNode; className?: string }) {

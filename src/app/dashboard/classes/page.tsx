@@ -127,14 +127,14 @@ export default function ClassesPage() {
           const femaleCount = classStudents.filter(s => s.gender === 'female').length;
           
           return (
-            <Card key={cls.id} hover>
+            <Card key={cls.id} hover className="p-4 sm:p-5">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
                     <BookOpen className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-slate-900 dark:text-white">{cls.name}</h3>
+                    <h3 className="font-semibold text-slate-900">{cls.name}</h3>
                     <p className="text-sm text-slate-500">Grade {cls.grade}</p>
                   </div>
                 </div>
@@ -142,13 +142,13 @@ export default function ClassesPage() {
                   <div className="flex gap-1">
                     <button
                       onClick={() => handleEdit(cls)}
-                      className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+                      className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
                     >
-                      <Edit className="w-4 h-4 text-slate-600 dark:text-slate-400" />
+                      <Edit className="w-4 h-4 text-slate-600" />
                     </button>
                     <button
                       onClick={() => handleDelete(cls.id)}
-                      className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                      className="p-2 hover:bg-red-50 rounded-lg transition-colors"
                     >
                       <Trash2 className="w-4 h-4 text-red-500" />
                     </button>
@@ -157,26 +157,26 @@ export default function ClassesPage() {
               </div>
 
               <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-700/50">
-                  <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                <div className="flex items-center justify-between p-3 rounded-lg bg-slate-50">
+                  <div className="flex items-center gap-2 text-sm text-slate-600">
                     <GraduationCap className="w-4 h-4" />
                     <span>Students</span>
                   </div>
-                  <span className="font-semibold text-slate-900 dark:text-white">{classStudents.length}</span>
+                  <span className="font-semibold text-slate-900">{classStudents.length}</span>
                 </div>
 
                 <div className="flex gap-2">
-                  <div className="flex-1 p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-center">
+                  <div className="flex-1 p-2 rounded-lg bg-blue-50 text-center">
                     <p className="text-lg font-bold text-blue-600">{maleCount}</p>
                     <p className="text-xs text-blue-600/70">Male</p>
                   </div>
-                  <div className="flex-1 p-2 rounded-lg bg-pink-50 dark:bg-pink-900/20 text-center">
+                  <div className="flex-1 p-2 rounded-lg bg-pink-50 text-center">
                     <p className="text-lg font-bold text-pink-600">{femaleCount}</p>
                     <p className="text-xs text-pink-600/70">Female</p>
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between pt-3 border-t border-slate-200 dark:border-slate-700">
+                <div className="flex items-center justify-between pt-3 border-t border-slate-200">
                   <span className="text-sm text-slate-500">Mobility Level</span>
                   <Badge 
                     variant={cls.mobilityLevel === 'high' ? 'success' : cls.mobilityLevel === 'medium' ? 'warning' : 'default'}
@@ -199,10 +199,10 @@ export default function ClassesPage() {
       </div>
 
       {classes.length === 0 && (
-        <Card>
+        <Card className="p-4 sm:p-6">
           <div className="text-center py-12">
             <BookOpen className="w-12 h-12 mx-auto text-slate-400 mb-4" />
-            <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-2">No Classes Found</h3>
+            <h3 className="text-lg font-medium text-slate-900 mb-2">No Classes Found</h3>
             <p className="text-slate-500 mb-4">Get started by creating your first class.</p>
             {user?.role === 'school_admin' && (
               <Button onClick={() => setIsModalOpen(true)}>

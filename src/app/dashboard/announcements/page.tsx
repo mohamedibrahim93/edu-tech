@@ -8,9 +8,11 @@ import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { Badge } from '@/components/ui/Badge';
 import { Modal } from '@/components/ui/Modal';
-import { useAuth, getRoleName } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { db } from '@/lib/db';
 import { format } from 'date-fns';
+import { ar, enUS } from 'date-fns/locale';
 import { v4 as uuidv4 } from 'uuid';
 import { 
   Plus, 
@@ -30,11 +32,14 @@ interface AnnouncementWithAuthor extends Announcement {
 
 export default function AnnouncementsPage() {
   const { user } = useAuth();
+  const { t, isRTL, language } = useLanguage();
   const [announcements, setAnnouncements] = useState<AnnouncementWithAuthor[]>([]);
   const [filterType, setFilterType] = useState('all');
   const [filterPriority, setFilterPriority] = useState('all');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingAnnouncement, setEditingAnnouncement] = useState<Announcement | null>(null);
+  
+  const dateLocale = language === 'ar' ? ar : enUS;
   
   const [formData, setFormData] = useState({
     title: '',
@@ -42,6 +47,16 @@ export default function AnnouncementsPage() {
     type: 'announcement' as 'announcement' | 'alert' | 'instruction' | 'evacuation',
     priority: 'medium' as 'low' | 'medium' | 'high' | 'urgent',
   });
+
+  const getRoleNameTranslated = (role: string): string => {
+    const roleKeys: Record<string, string> = {
+      moe: 'role.moe',
+      school_admin: 'role.school_admin',
+      teacher: 'role.teacher',
+      parent: 'role.parent',
+    };
+    return t(roleKeys[role] || 'role.parent');
+  };
 
   const loadData = async () => {
     let announcementsData: Announcement[] = [];
@@ -117,7 +132,7 @@ export default function AnnouncementsPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (confirm('Are you sure you want to delete this announcement?')) {
+    if (confirm(isRTL ? 'هل أنت متأكد من حذف هذا الإعلان؟' : 'Are you sure you want to delete this announcement?')) {
       await db.announcements.delete(id);
       loadData();
     }
@@ -141,12 +156,21 @@ export default function AnnouncementsPage() {
     }
   };
 
+  const getTypeLabel = (type: string) => {
+    switch (type) {
+      case 'alert': return t('announcements.alert');
+      case 'instruction': return t('announcements.instruction');
+      case 'evacuation': return t('announcements.evacuation');
+      default: return t('announcements.announcement');
+    }
+  };
+
   const getPriorityBadge = (priority: string) => {
     switch (priority) {
-      case 'urgent': return <Badge variant="danger">Urgent</Badge>;
-      case 'high': return <Badge variant="warning">High</Badge>;
-      case 'medium': return <Badge variant="info">Medium</Badge>;
-      default: return <Badge variant="default">Low</Badge>;
+      case 'urgent': return <Badge variant="danger">{t('announcements.urgent')}</Badge>;
+      case 'high': return <Badge variant="warning">{isRTL ? 'عالي' : 'High'}</Badge>;
+      case 'medium': return <Badge variant="info">{isRTL ? 'متوسط' : 'Medium'}</Badge>;
+      default: return <Badge variant="default">{isRTL ? 'منخفض' : 'Low'}</Badge>;
     }
   };
 
@@ -154,19 +178,19 @@ export default function AnnouncementsPage() {
   const canEdit = (announcement: Announcement) => announcement.authorId === user?.id;
 
   return (
-    <DashboardLayout title="Announcements" subtitle="View and manage announcements">
+    <DashboardLayout title={t('announcements.title')} subtitle={t('announcements.subtitle')}>
       <Card className="mb-6 p-4 sm:p-6">
-        <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
-          <div className="flex gap-4">
+        <div className={`flex flex-col md:flex-row gap-4 items-start md:items-center justify-between ${isRTL ? 'md:flex-row-reverse' : ''}`}>
+          <div className={`flex gap-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
             <Select
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
               options={[
-                { value: 'all', label: 'All Types' },
-                { value: 'announcement', label: 'Announcements' },
-                { value: 'alert', label: 'Alerts' },
-                { value: 'instruction', label: 'Instructions' },
-                { value: 'evacuation', label: 'Evacuation' },
+                { value: 'all', label: isRTL ? 'جميع الأنواع' : 'All Types' },
+                { value: 'announcement', label: t('announcements.announcement') },
+                { value: 'alert', label: t('announcements.alert') },
+                { value: 'instruction', label: t('announcements.instruction') },
+                { value: 'evacuation', label: t('announcements.evacuation') },
               ]}
               className="w-40"
             />
@@ -174,19 +198,19 @@ export default function AnnouncementsPage() {
               value={filterPriority}
               onChange={(e) => setFilterPriority(e.target.value)}
               options={[
-                { value: 'all', label: 'All Priorities' },
-                { value: 'urgent', label: 'Urgent' },
-                { value: 'high', label: 'High' },
-                { value: 'medium', label: 'Medium' },
-                { value: 'low', label: 'Low' },
+                { value: 'all', label: isRTL ? 'جميع الأولويات' : 'All Priorities' },
+                { value: 'urgent', label: t('announcements.urgent') },
+                { value: 'high', label: isRTL ? 'عالي' : 'High' },
+                { value: 'medium', label: isRTL ? 'متوسط' : 'Medium' },
+                { value: 'low', label: isRTL ? 'منخفض' : 'Low' },
               ]}
               className="w-40"
             />
           </div>
           {canCreate && (
             <Button onClick={() => setIsModalOpen(true)}>
-              <Plus className="w-4 h-4 mr-2" />
-              New Announcement
+              <Plus className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+              {t('announcements.newAnnouncement')}
             </Button>
           )}
         </div>
@@ -197,48 +221,48 @@ export default function AnnouncementsPage() {
           <Card className="p-4 sm:p-6">
             <div className="text-center py-12">
               <Bell className="w-12 h-12 mx-auto text-slate-400 mb-4" />
-              <h3 className="text-lg font-medium text-slate-900 mb-2">No Announcements</h3>
-              <p className="text-slate-500">There are no announcements to display.</p>
+              <h3 className="text-lg font-medium text-slate-900 mb-2">{t('announcements.noAnnouncements')}</h3>
+              <p className="text-slate-500">{isRTL ? 'لا توجد إعلانات لعرضها.' : 'There are no announcements to display.'}</p>
             </div>
           </Card>
         ) : (
           filteredAnnouncements.map((announcement) => (
             <Card key={announcement.id} className={`p-4 sm:p-6
-              ${announcement.priority === 'urgent' ? 'border-l-4 border-l-red-500' : ''}
-              ${announcement.priority === 'high' ? 'border-l-4 border-l-amber-500' : ''}
+              ${announcement.priority === 'urgent' ? (isRTL ? 'border-r-4 border-r-red-500' : 'border-l-4 border-l-red-500') : ''}
+              ${announcement.priority === 'high' ? (isRTL ? 'border-r-4 border-r-amber-500' : 'border-l-4 border-l-amber-500') : ''}
             `}>
-              <div className="flex items-start gap-4">
+              <div className={`flex items-start gap-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
                 <div className={`p-3 rounded-xl ${getTypeColor(announcement.type)}`}>
                   {getTypeIcon(announcement.type)}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
+                  <div className={`flex items-start justify-between gap-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                    <div className={isRTL ? 'text-right' : ''}>
                       <h3 className="font-semibold text-lg text-slate-900">{announcement.title}</h3>
-                      <div className="flex items-center gap-3 mt-1 text-sm text-slate-500">
-                        <span>{announcement.author?.name || 'Unknown'}</span>
+                      <div className={`flex items-center gap-3 mt-1 text-sm text-slate-500 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                        <span>{announcement.author?.name || (isRTL ? 'غير معروف' : 'Unknown')}</span>
                         <span>•</span>
-                        <span>{getRoleName(announcement.authorRole)}</span>
+                        <span>{getRoleNameTranslated(announcement.authorRole)}</span>
                         <span>•</span>
-                        <span>{format(new Date(announcement.createdAt), 'MMM d, yyyy h:mm a')}</span>
+                        <span>{format(new Date(announcement.createdAt), 'MMM d, yyyy h:mm a', { locale: dateLocale })}</span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
                       {getPriorityBadge(announcement.priority)}
-                      <Badge variant="default">{announcement.type}</Badge>
+                      <Badge variant="default">{getTypeLabel(announcement.type)}</Badge>
                     </div>
                   </div>
-                  <p className="mt-3 text-slate-600">{announcement.content}</p>
+                  <p className={`mt-3 text-slate-600 ${isRTL ? 'text-right' : ''}`}>{announcement.content}</p>
                   
                   {canEdit(announcement) && (
-                    <div className="flex gap-2 mt-4">
+                    <div className={`flex gap-2 mt-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
                       <Button size="sm" variant="ghost" onClick={() => handleEdit(announcement)}>
-                        <Edit className="w-4 h-4 mr-1" />
-                        Edit
+                        <Edit className={`w-4 h-4 ${isRTL ? 'ml-1' : 'mr-1'}`} />
+                        {t('common.edit')}
                       </Button>
                       <Button size="sm" variant="ghost" onClick={() => handleDelete(announcement.id)}>
-                        <Trash2 className="w-4 h-4 mr-1 text-red-500" />
-                        Delete
+                        <Trash2 className={`w-4 h-4 ${isRTL ? 'ml-1' : 'mr-1'} text-red-500`} />
+                        {t('common.delete')}
                       </Button>
                     </div>
                   )}
@@ -257,58 +281,61 @@ export default function AnnouncementsPage() {
           setEditingAnnouncement(null);
           setFormData({ title: '', content: '', type: 'announcement', priority: 'medium' });
         }}
-        title={editingAnnouncement ? 'Edit Announcement' : 'New Announcement'}
+        title={editingAnnouncement ? t('announcements.editAnnouncement') : t('announcements.newAnnouncement')}
         size="lg"
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
-            label="Title"
+            label={isRTL ? 'العنوان' : 'Title'}
             value={formData.title}
             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            placeholder="Enter announcement title"
+            placeholder={isRTL ? 'أدخل عنوان الإعلان' : 'Enter announcement title'}
             required
           />
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">Content</label>
+            <label className={`block text-sm font-semibold text-slate-700 mb-2 ${isRTL ? 'text-right' : ''}`}>
+              {t('announcements.content')}
+            </label>
             <textarea
               value={formData.content}
               onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-              placeholder="Enter announcement content"
+              placeholder={isRTL ? 'أدخل محتوى الإعلان' : 'Enter announcement content'}
               rows={4}
               required
-              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all duration-200"
+              dir={isRTL ? 'rtl' : 'ltr'}
+              className={`w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all duration-200 ${isRTL ? 'text-right' : ''}`}
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <Select
-              label="Type"
+              label={t('announcements.type')}
               value={formData.type}
               onChange={(e) => setFormData({ ...formData, type: e.target.value as typeof formData.type })}
               options={[
-                { value: 'announcement', label: 'Announcement' },
-                { value: 'alert', label: 'Alert' },
-                { value: 'instruction', label: 'Instruction' },
-                { value: 'evacuation', label: 'Evacuation' },
+                { value: 'announcement', label: t('announcements.announcement') },
+                { value: 'alert', label: t('announcements.alert') },
+                { value: 'instruction', label: t('announcements.instruction') },
+                { value: 'evacuation', label: t('announcements.evacuation') },
               ]}
             />
             <Select
-              label="Priority"
+              label={t('announcements.priority')}
               value={formData.priority}
               onChange={(e) => setFormData({ ...formData, priority: e.target.value as typeof formData.priority })}
               options={[
-                { value: 'low', label: 'Low' },
-                { value: 'medium', label: 'Medium' },
-                { value: 'high', label: 'High' },
-                { value: 'urgent', label: 'Urgent' },
+                { value: 'low', label: isRTL ? 'منخفض' : 'Low' },
+                { value: 'medium', label: isRTL ? 'متوسط' : 'Medium' },
+                { value: 'high', label: isRTL ? 'عالي' : 'High' },
+                { value: 'urgent', label: t('announcements.urgent') },
               ]}
             />
           </div>
-          <div className="flex justify-end gap-3 pt-4">
+          <div className={`flex gap-3 pt-4 ${isRTL ? 'flex-row-reverse justify-start' : 'justify-end'}`}>
             <Button type="button" variant="secondary" onClick={() => setIsModalOpen(false)}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button type="submit">
-              {editingAnnouncement ? 'Update' : 'Create'} Announcement
+              {editingAnnouncement ? t('common.update') : t('common.create')} {isRTL ? 'الإعلان' : 'Announcement'}
             </Button>
           </div>
         </form>
@@ -316,4 +343,3 @@ export default function AnnouncementsPage() {
     </DashboardLayout>
   );
 }
-

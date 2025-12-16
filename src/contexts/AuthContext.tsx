@@ -33,6 +33,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = useCallback(() => {
     setUser(null);
     localStorage.removeItem('edutech_user_id');
+    window.location.href = '/';
   }, []);
 
   useEffect(() => {

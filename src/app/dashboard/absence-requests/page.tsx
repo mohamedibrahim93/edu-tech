@@ -10,8 +10,10 @@ import { Badge } from '@/components/ui/Badge';
 import { Modal } from '@/components/ui/Modal';
 import { Table } from '@/components/ui/Table';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { db } from '@/lib/db';
 import { format } from 'date-fns';
+import { ar, enUS } from 'date-fns/locale';
 import { v4 as uuidv4 } from 'uuid';
 import { 
   Plus, 
@@ -32,11 +34,14 @@ interface AbsenceRequestWithDetails extends AbsenceRequest {
 
 export default function AbsenceRequestsPage() {
   const { user } = useAuth();
+  const { t, isRTL, language } = useLanguage();
   const [requests, setRequests] = useState<AbsenceRequestWithDetails[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
   const [filterStatus, setFilterStatus] = useState('all');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [viewingRequest, setViewingRequest] = useState<AbsenceRequestWithDetails | null>(null);
+  
+  const dateLocale = language === 'ar' ? ar : enUS;
   
   const [formData, setFormData] = useState({
     studentId: '',
@@ -123,23 +128,23 @@ export default function AbsenceRequestsPage() {
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'approved': return <Badge variant="success">Approved</Badge>;
-      case 'rejected': return <Badge variant="danger">Rejected</Badge>;
-      default: return <Badge variant="warning">Pending</Badge>;
+      case 'approved': return <Badge variant="success">{t('absenceRequests.approved')}</Badge>;
+      case 'rejected': return <Badge variant="danger">{t('absenceRequests.rejected')}</Badge>;
+      default: return <Badge variant="warning">{t('absenceRequests.pending')}</Badge>;
     }
   };
 
   const columns = [
     {
       key: 'student',
-      header: 'Student',
+      header: t('absenceRequests.student'),
       render: (request: AbsenceRequestWithDetails) => (
-        <div className="flex items-center gap-3">
+        <div className={`flex items-center gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
           <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-semibold text-sm ${request.student?.gender === 'male' ? 'bg-blue-500' : 'bg-pink-500'}`}>
             {request.student?.name.charAt(0) || '?'}
           </div>
-          <div>
-            <p className="font-medium text-slate-900">{request.student?.name || 'Unknown'}</p>
+          <div className={isRTL ? 'text-right' : ''}>
+            <p className="font-medium text-slate-900">{request.student?.name || (isRTL ? 'غير معروف' : 'Unknown')}</p>
             <p className="text-xs text-slate-500">{request.student?.studentNumber}</p>
           </div>
         </div>
@@ -147,42 +152,42 @@ export default function AbsenceRequestsPage() {
     },
     {
       key: 'dates',
-      header: 'Dates',
+      header: t('absenceRequests.dates'),
       render: (request: AbsenceRequestWithDetails) => (
-        <div className="text-sm">
-          <p>{format(new Date(request.startDate), 'MMM d')}</p>
-          <p className="text-slate-500">to {format(new Date(request.endDate), 'MMM d, yyyy')}</p>
+        <div className={`text-sm ${isRTL ? 'text-right' : ''}`}>
+          <p>{format(new Date(request.startDate), 'MMM d', { locale: dateLocale })}</p>
+          <p className="text-slate-500">{isRTL ? 'إلى' : 'to'} {format(new Date(request.endDate), 'MMM d, yyyy', { locale: dateLocale })}</p>
         </div>
       ),
     },
     {
       key: 'reason',
-      header: 'Reason',
+      header: t('absenceRequests.reason'),
       render: (request: AbsenceRequestWithDetails) => (
-        <p className="text-sm truncate max-w-xs">{request.reason}</p>
+        <p className={`text-sm truncate max-w-xs ${isRTL ? 'text-right' : ''}`}>{request.reason}</p>
       ),
     },
     {
       key: 'parent',
-      header: 'Requested By',
+      header: t('absenceRequests.requestedBy'),
       render: (request: AbsenceRequestWithDetails) => (
-        <p className="text-sm">{request.parentUser?.name || 'Unknown'}</p>
+        <p className={`text-sm ${isRTL ? 'text-right' : ''}`}>{request.parentUser?.name || (isRTL ? 'غير معروف' : 'Unknown')}</p>
       ),
     },
     {
       key: 'status',
-      header: 'Status',
+      header: t('common.status'),
       render: (request: AbsenceRequestWithDetails) => getStatusBadge(request.status),
     },
     {
       key: 'actions',
-      header: 'Actions',
+      header: t('common.actions'),
       render: (request: AbsenceRequestWithDetails) => (
-        <div className="flex items-center gap-2">
+        <div className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
           <button
             onClick={() => setViewingRequest(request)}
             className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
-            title="View Details"
+            title={isRTL ? 'عرض التفاصيل' : 'View Details'}
           >
             <Eye className="w-4 h-4 text-slate-600" />
           </button>
@@ -191,14 +196,14 @@ export default function AbsenceRequestsPage() {
               <button
                 onClick={() => handleApprove(request)}
                 className="p-2 hover:bg-emerald-50 rounded-lg transition-colors"
-                title="Approve"
+                title={isRTL ? 'موافقة' : 'Approve'}
               >
                 <Check className="w-4 h-4 text-emerald-500" />
               </button>
               <button
                 onClick={() => handleReject(request)}
                 className="p-2 hover:bg-red-50 rounded-lg transition-colors"
-                title="Reject"
+                title={isRTL ? 'رفض' : 'Reject'}
               >
                 <X className="w-4 h-4 text-red-500" />
               </button>
@@ -210,24 +215,24 @@ export default function AbsenceRequestsPage() {
   ];
 
   return (
-    <DashboardLayout title="Absence Requests" subtitle="Manage student absence requests">
+    <DashboardLayout title={t('absenceRequests.title')} subtitle={t('absenceRequests.subtitle')}>
       <Card className="mb-6 p-4 sm:p-6">
-        <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+        <div className={`flex flex-col md:flex-row gap-4 items-start md:items-center justify-between ${isRTL ? 'md:flex-row-reverse' : ''}`}>
           <Select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
             options={[
-              { value: 'all', label: 'All Status' },
-              { value: 'pending', label: 'Pending' },
-              { value: 'approved', label: 'Approved' },
-              { value: 'rejected', label: 'Rejected' },
+              { value: 'all', label: isRTL ? 'جميع الحالات' : 'All Status' },
+              { value: 'pending', label: t('absenceRequests.pending') },
+              { value: 'approved', label: t('absenceRequests.approved') },
+              { value: 'rejected', label: t('absenceRequests.rejected') },
             ]}
             className="w-40"
           />
           {user?.role === 'parent' && (
             <Button onClick={() => setIsModalOpen(true)}>
-              <Plus className="w-4 h-4 mr-2" />
-              New Request
+              <Plus className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+              {t('absenceRequests.newRequest')}
             </Button>
           )}
         </div>
@@ -238,7 +243,7 @@ export default function AbsenceRequestsPage() {
           data={filteredRequests}
           columns={columns}
           keyExtractor={(request) => request.id}
-          emptyMessage="No absence requests found"
+          emptyMessage={t('absenceRequests.noRequests')}
         />
       </Card>
 
@@ -249,29 +254,29 @@ export default function AbsenceRequestsPage() {
           setIsModalOpen(false);
           setFormData({ studentId: '', startDate: '', endDate: '', reason: '' });
         }}
-        title="Submit Absence Request"
+        title={t('absenceRequests.submitRequest')}
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <Select
-            label="Student"
+            label={t('absenceRequests.student')}
             value={formData.studentId}
             onChange={(e) => setFormData({ ...formData, studentId: e.target.value })}
             options={[
-              { value: '', label: 'Select a student' },
+              { value: '', label: isRTL ? 'اختر طالب' : 'Select a student' },
               ...students.map(s => ({ value: s.id, label: s.name })),
             ]}
             required
           />
           <div className="grid grid-cols-2 gap-4">
             <Input
-              label="Start Date"
+              label={t('absenceRequests.startDate')}
               type="date"
               value={formData.startDate}
               onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
               required
             />
             <Input
-              label="End Date"
+              label={t('absenceRequests.endDate')}
               type="date"
               value={formData.endDate}
               onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
@@ -279,22 +284,25 @@ export default function AbsenceRequestsPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">Reason</label>
+            <label className={`block text-sm font-semibold text-slate-700 mb-2 ${isRTL ? 'text-right' : ''}`}>
+              {t('absenceRequests.reason')}
+            </label>
             <textarea
               value={formData.reason}
               onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
-              placeholder="Explain the reason for absence"
+              placeholder={isRTL ? 'اشرح سبب الغياب' : 'Explain the reason for absence'}
               rows={3}
               required
-              className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all duration-200"
+              dir={isRTL ? 'rtl' : 'ltr'}
+              className={`w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all duration-200 ${isRTL ? 'text-right' : ''}`}
             />
           </div>
-          <div className="flex justify-end gap-3 pt-4">
+          <div className={`flex gap-3 pt-4 ${isRTL ? 'flex-row-reverse justify-start' : 'justify-end'}`}>
             <Button type="button" variant="secondary" onClick={() => setIsModalOpen(false)}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button type="submit">
-              Submit Request
+              {t('absenceRequests.submitRequest')}
             </Button>
           </div>
         </form>
@@ -304,61 +312,61 @@ export default function AbsenceRequestsPage() {
       <Modal
         isOpen={!!viewingRequest}
         onClose={() => setViewingRequest(null)}
-        title="Absence Request Details"
+        title={t('absenceRequests.requestDetails')}
       >
         {viewingRequest && (
           <div className="space-y-4">
             <div className="p-4 rounded-xl bg-slate-50">
-              <div className="flex items-center gap-3 mb-4">
+              <div className={`flex items-center gap-3 mb-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
                 <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold ${viewingRequest.student?.gender === 'male' ? 'bg-blue-500' : 'bg-pink-500'}`}>
                   {viewingRequest.student?.name.charAt(0) || '?'}
                 </div>
-                <div>
+                <div className={isRTL ? 'text-right' : ''}>
                   <p className="font-semibold text-lg text-slate-900">{viewingRequest.student?.name}</p>
                   <p className="text-sm text-slate-500">{viewingRequest.student?.studentNumber}</p>
                 </div>
               </div>
               
               <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <p className="text-slate-500">Start Date</p>
+                <div className={isRTL ? 'text-right' : ''}>
+                  <p className="text-slate-500">{t('absenceRequests.startDate')}</p>
                   <p className="font-medium text-slate-900">
-                    {format(new Date(viewingRequest.startDate), 'MMMM d, yyyy')}
+                    {format(new Date(viewingRequest.startDate), 'MMMM d, yyyy', { locale: dateLocale })}
                   </p>
                 </div>
-                <div>
-                  <p className="text-slate-500">End Date</p>
+                <div className={isRTL ? 'text-right' : ''}>
+                  <p className="text-slate-500">{t('absenceRequests.endDate')}</p>
                   <p className="font-medium text-slate-900">
-                    {format(new Date(viewingRequest.endDate), 'MMMM d, yyyy')}
+                    {format(new Date(viewingRequest.endDate), 'MMMM d, yyyy', { locale: dateLocale })}
                   </p>
                 </div>
-                <div>
-                  <p className="text-slate-500">Requested By</p>
+                <div className={isRTL ? 'text-right' : ''}>
+                  <p className="text-slate-500">{t('absenceRequests.requestedBy')}</p>
                   <p className="font-medium text-slate-900">{viewingRequest.parentUser?.name}</p>
                 </div>
-                <div>
-                  <p className="text-slate-500">Status</p>
+                <div className={isRTL ? 'text-right' : ''}>
+                  <p className="text-slate-500">{t('common.status')}</p>
                   {getStatusBadge(viewingRequest.status)}
                 </div>
               </div>
             </div>
             
-            <div>
-              <p className="text-sm font-medium text-slate-700 mb-2">Reason</p>
+            <div className={isRTL ? 'text-right' : ''}>
+              <p className="text-sm font-medium text-slate-700 mb-2">{t('absenceRequests.reason')}</p>
               <p className="text-slate-600">{viewingRequest.reason}</p>
             </div>
             
             {viewingRequest.reviewer && (
-              <div className="p-4 rounded-xl bg-slate-50">
-                <p className="text-sm font-medium text-slate-700 mb-2">Reviewed By</p>
+              <div className={`p-4 rounded-xl bg-slate-50 ${isRTL ? 'text-right' : ''}`}>
+                <p className="text-sm font-medium text-slate-700 mb-2">{t('absenceRequests.reviewedBy')}</p>
                 <p className="text-slate-600">
-                  {viewingRequest.reviewer.name} on {format(new Date(viewingRequest.reviewedAt!), 'MMM d, yyyy')}
+                  {viewingRequest.reviewer.name} {isRTL ? 'في' : 'on'} {format(new Date(viewingRequest.reviewedAt!), 'MMM d, yyyy', { locale: dateLocale })}
                 </p>
               </div>
             )}
             
-            <div className="flex justify-end pt-4">
-              <Button onClick={() => setViewingRequest(null)}>Close</Button>
+            <div className={`flex pt-4 ${isRTL ? 'justify-start' : 'justify-end'}`}>
+              <Button onClick={() => setViewingRequest(null)}>{t('common.close')}</Button>
             </div>
           </div>
         )}
@@ -366,4 +374,3 @@ export default function AbsenceRequestsPage() {
     </DashboardLayout>
   );
 }
-

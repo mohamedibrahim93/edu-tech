@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Modal } from '@/components/ui/Modal';
 import { Input } from '@/components/ui/Input';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { db } from '@/lib/db';
 import { v4 as uuidv4 } from 'uuid';
 import { Plus, Calendar, Clock, BookOpen, User, Trash2 } from 'lucide-react';
@@ -21,7 +22,6 @@ interface ScheduleWithDetails extends Schedule {
   teacherUser?: UserType;
 }
 
-const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const TIME_SLOTS = [
   '07:00', '07:30', '08:00', '08:30', '09:00', '09:30', '10:00', '10:30',
   '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30',
@@ -30,6 +30,7 @@ const TIME_SLOTS = [
 
 export default function SchedulesPage() {
   const { user } = useAuth();
+  const { t, isRTL } = useLanguage();
   const [schedules, setSchedules] = useState<ScheduleWithDetails[]>([]);
   const [classes, setClasses] = useState<Class[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
@@ -46,6 +47,16 @@ export default function SchedulesPage() {
     startTime: '08:00',
     endTime: '09:00',
   });
+
+  const DAYS = [
+    t('day.sunday'),
+    t('day.monday'),
+    t('day.tuesday'),
+    t('day.wednesday'),
+    t('day.thursday'),
+    t('day.friday'),
+    t('day.saturday'),
+  ];
 
   const loadData = async () => {
     if (!user?.schoolId) return;
@@ -113,7 +124,7 @@ export default function SchedulesPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (confirm('Are you sure you want to delete this schedule entry?')) {
+    if (confirm(isRTL ? 'هل أنت متأكد من حذف هذا الجدول؟' : 'Are you sure you want to delete this schedule entry?')) {
       await db.schedules.delete(id);
       loadData();
     }
@@ -122,7 +133,7 @@ export default function SchedulesPage() {
   const getTeacherName = (teacherId: string) => {
     const teacher = teachers.find(t => t.id === teacherId);
     const teacherUser = teacherUsers.find(u => u.id === teacher?.userId);
-    return teacherUser?.name || 'Unknown';
+    return teacherUser?.name || (isRTL ? 'غير معروف' : 'Unknown');
   };
 
   // Group schedules by day
@@ -148,9 +159,9 @@ export default function SchedulesPage() {
   };
 
   return (
-    <DashboardLayout title="Schedules" subtitle="Manage class schedules">
+    <DashboardLayout title={t('schedules.title')} subtitle={t('schedules.subtitle')}>
       <Card className="mb-6 p-4 sm:p-6">
-        <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+        <div className={`flex flex-col md:flex-row gap-4 items-start md:items-center justify-between ${isRTL ? 'md:flex-row-reverse' : ''}`}>
           <Select
             value={selectedClass}
             onChange={(e) => setSelectedClass(e.target.value)}
@@ -162,8 +173,8 @@ export default function SchedulesPage() {
               setFormData({ ...formData, classId: selectedClass });
               setIsModalOpen(true);
             }}>
-              <Plus className="w-4 h-4 mr-2" />
-              Add Schedule
+              <Plus className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+              {t('schedules.addSchedule')}
             </Button>
           )}
         </div>
@@ -173,10 +184,10 @@ export default function SchedulesPage() {
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
         {schedulesByDay.filter(d => d.dayIndex >= 0 && d.dayIndex <= 4).map(({ day, dayIndex, schedules: daySchedules }) => (
           <Card key={day}>
-            <CardHeader title={day} subtitle={`${daySchedules.length} classes`} />
+            <CardHeader title={day} subtitle={`${daySchedules.length} ${isRTL ? 'حصص' : 'classes'}`} />
             <div className="space-y-2 px-4 sm:px-6 pb-4 sm:pb-6">
               {daySchedules.length === 0 ? (
-                <p className="text-sm text-slate-500 text-center py-4">No classes</p>
+                <p className="text-sm text-slate-500 text-center py-4">{t('schedules.noClasses')}</p>
               ) : (
                 daySchedules.map((schedule) => (
                   <div
@@ -186,19 +197,19 @@ export default function SchedulesPage() {
                     {user?.role === 'school_admin' && (
                       <button
                         onClick={() => handleDelete(schedule.id)}
-                        className="absolute top-2 right-2 p-1 rounded-lg bg-white/50 opacity-0 group-hover:opacity-100 transition-opacity"
+                        className={`absolute top-2 ${isRTL ? 'left-2' : 'right-2'} p-1 rounded-lg bg-white/50 opacity-0 group-hover:opacity-100 transition-opacity`}
                       >
                         <Trash2 className="w-3 h-3 text-red-500" />
                       </button>
                     )}
-                    <div className="flex items-center gap-2 mb-1">
+                    <div className={`flex items-center gap-2 mb-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
                       <Clock className="w-3 h-3" />
                       <span className="text-xs font-medium">
                         {schedule.startTime} - {schedule.endTime}
                       </span>
                     </div>
                     <p className="font-medium">{schedule.subject?.name}</p>
-                    <div className="flex items-center gap-1 mt-1 text-xs opacity-75">
+                    <div className={`flex items-center gap-1 mt-1 text-xs opacity-75 ${isRTL ? 'flex-row-reverse' : ''}`}>
                       <User className="w-3 h-3" />
                       <span>{schedule.teacherUser?.name}</span>
                     </div>
@@ -212,7 +223,7 @@ export default function SchedulesPage() {
 
       {/* Subjects Legend */}
       <Card className="mt-6">
-        <CardHeader title="Subjects" subtitle="Color legend" />
+        <CardHeader title={isRTL ? 'المواد' : 'Subjects'} subtitle={t('schedules.colorLegend')} />
         <div className="flex flex-wrap gap-2 px-4 sm:px-6 pb-4 sm:pb-6">
           {subjects.map((subject) => (
             <div
@@ -232,65 +243,65 @@ export default function SchedulesPage() {
           setIsModalOpen(false);
           setFormData({ classId: '', subjectId: '', teacherId: '', dayOfWeek: 1, startTime: '08:00', endTime: '09:00' });
         }}
-        title="Add Schedule Entry"
+        title={t('schedules.addSchedule')}
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <Select
-            label="Class"
+            label={t('students.class')}
             value={formData.classId}
             onChange={(e) => setFormData({ ...formData, classId: e.target.value })}
             options={[
-              { value: '', label: 'Select a class' },
+              { value: '', label: t('students.selectClass') },
               ...classes.map(c => ({ value: c.id, label: c.name })),
             ]}
             required
           />
           <Select
-            label="Subject"
+            label={t('schedules.subject')}
             value={formData.subjectId}
             onChange={(e) => setFormData({ ...formData, subjectId: e.target.value })}
             options={[
-              { value: '', label: 'Select a subject' },
+              { value: '', label: isRTL ? 'اختر مادة' : 'Select a subject' },
               ...subjects.map(s => ({ value: s.id, label: s.name })),
             ]}
             required
           />
           <Select
-            label="Teacher"
+            label={t('role.teacher')}
             value={formData.teacherId}
             onChange={(e) => setFormData({ ...formData, teacherId: e.target.value })}
             options={[
-              { value: '', label: 'Select a teacher' },
+              { value: '', label: isRTL ? 'اختر معلماً' : 'Select a teacher' },
               ...teachers.map(t => ({ value: t.id, label: getTeacherName(t.id) })),
             ]}
             required
           />
           <Select
-            label="Day of Week"
+            label={t('schedules.dayOfWeek')}
             value={formData.dayOfWeek.toString()}
             onChange={(e) => setFormData({ ...formData, dayOfWeek: parseInt(e.target.value) })}
             options={DAYS.map((day, i) => ({ value: i.toString(), label: day }))}
           />
           <div className="grid grid-cols-2 gap-4">
             <Select
-              label="Start Time"
+              label={t('schedules.startTime')}
               value={formData.startTime}
               onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
               options={TIME_SLOTS.map(t => ({ value: t, label: t }))}
             />
             <Select
-              label="End Time"
+              label={t('schedules.endTime')}
               value={formData.endTime}
               onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
               options={TIME_SLOTS.map(t => ({ value: t, label: t }))}
             />
           </div>
-          <div className="flex justify-end gap-3 pt-4">
+          <div className={`flex justify-end gap-3 pt-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
             <Button type="button" variant="secondary" onClick={() => setIsModalOpen(false)}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button type="submit">
-              Add Schedule
+              {t('schedules.addSchedule')}
             </Button>
           </div>
         </form>
@@ -298,4 +309,3 @@ export default function SchedulesPage() {
     </DashboardLayout>
   );
 }
-

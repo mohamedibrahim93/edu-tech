@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ModalProps {
   isOpen: boolean;
@@ -12,6 +13,7 @@ interface ModalProps {
 }
 
 export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalProps) {
+  const { isRTL } = useLanguage();
   const [isAnimating, setIsAnimating] = useState(false);
   const [shouldRender, setShouldRender] = useState(false);
 
@@ -57,7 +59,7 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
+    <div className="fixed inset-0 z-50 overflow-y-auto" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="flex min-h-full items-end sm:items-center justify-center p-0 sm:p-4">
         {/* Backdrop */}
         <div
@@ -77,7 +79,7 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
           }`}
         >
           {/* Header */}
-          <div className="flex items-center justify-between p-4 sm:p-6 border-b border-slate-200 flex-shrink-0">
+          <div className={`flex items-center justify-between p-4 sm:p-6 border-b border-slate-200 flex-shrink-0 ${isRTL ? 'flex-row-reverse' : ''}`}>
             <h2 className="text-lg sm:text-xl font-bold text-slate-900">{title}</h2>
             <button
               onClick={onClose}

@@ -22,29 +22,30 @@ import {
   X,
 } from 'lucide-react';
 import { useAuth, getRoleName } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import type { UserRole } from '@/lib/types';
 
 interface NavItem {
-  name: string;
+  nameKey: string;
   href: string;
   icon: React.ElementType;
   roles: UserRole[];
 }
 
 const navItems: NavItem[] = [
-  { name: 'Dashboard', href: '/dashboard', icon: Home, roles: ['moe', 'school_admin', 'teacher', 'parent'] },
-  { name: 'Schools', href: '/dashboard/schools', icon: Building2, roles: ['moe'] },
-  { name: 'Classes', href: '/dashboard/classes', icon: BookOpen, roles: ['school_admin', 'teacher'] },
-  { name: 'Students', href: '/dashboard/students', icon: GraduationCap, roles: ['school_admin', 'teacher'] },
-  { name: 'Teachers', href: '/dashboard/teachers', icon: UserCheck, roles: ['moe', 'school_admin'] },
-  { name: 'Parents', href: '/dashboard/parents', icon: Users, roles: ['school_admin'] },
-  { name: 'Attendance', href: '/dashboard/attendance', icon: ClipboardList, roles: ['school_admin', 'teacher'] },
-  { name: 'Schedules', href: '/dashboard/schedules', icon: Calendar, roles: ['school_admin', 'teacher'] },
-  { name: 'Absence Requests', href: '/dashboard/absence-requests', icon: FileText, roles: ['school_admin', 'parent'] },
-  { name: 'Announcements', href: '/dashboard/announcements', icon: Bell, roles: ['moe', 'school_admin', 'teacher', 'parent'] },
-  { name: 'Reports', href: '/dashboard/reports', icon: BarChart3, roles: ['moe', 'school_admin', 'teacher'] },
-  { name: 'Issues', href: '/dashboard/issues', icon: AlertCircle, roles: ['school_admin', 'teacher', 'parent'] },
-  { name: 'My Children', href: '/dashboard/my-children', icon: GraduationCap, roles: ['parent'] },
+  { nameKey: 'nav.dashboard', href: '/dashboard', icon: Home, roles: ['moe', 'school_admin', 'teacher', 'parent'] },
+  { nameKey: 'nav.schools', href: '/dashboard/schools', icon: Building2, roles: ['moe'] },
+  { nameKey: 'nav.classes', href: '/dashboard/classes', icon: BookOpen, roles: ['school_admin', 'teacher'] },
+  { nameKey: 'nav.students', href: '/dashboard/students', icon: GraduationCap, roles: ['school_admin', 'teacher'] },
+  { nameKey: 'nav.teachers', href: '/dashboard/teachers', icon: UserCheck, roles: ['moe', 'school_admin'] },
+  { nameKey: 'nav.parents', href: '/dashboard/parents', icon: Users, roles: ['school_admin'] },
+  { nameKey: 'nav.attendance', href: '/dashboard/attendance', icon: ClipboardList, roles: ['school_admin', 'teacher'] },
+  { nameKey: 'nav.schedules', href: '/dashboard/schedules', icon: Calendar, roles: ['school_admin', 'teacher'] },
+  { nameKey: 'nav.absenceRequests', href: '/dashboard/absence-requests', icon: FileText, roles: ['school_admin', 'parent'] },
+  { nameKey: 'nav.announcements', href: '/dashboard/announcements', icon: Bell, roles: ['moe', 'school_admin', 'teacher', 'parent'] },
+  { nameKey: 'nav.reports', href: '/dashboard/reports', icon: BarChart3, roles: ['moe', 'school_admin', 'teacher'] },
+  { nameKey: 'nav.issues', href: '/dashboard/issues', icon: AlertCircle, roles: ['school_admin', 'teacher', 'parent'] },
+  { nameKey: 'nav.myChildren', href: '/dashboard/my-children', icon: GraduationCap, roles: ['parent'] },
 ];
 
 interface SidebarProps {
@@ -55,6 +56,7 @@ interface SidebarProps {
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
   const { user, logout } = useAuth();
+  const { t, isRTL } = useLanguage();
 
   if (!user) return null;
 
@@ -65,6 +67,16 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     school_admin: 'bg-blue-600',
     teacher: 'bg-emerald-600',
     parent: 'bg-pink-600',
+  };
+
+  const getRoleNameTranslated = (role: UserRole): string => {
+    const roleKeys: Record<UserRole, string> = {
+      moe: 'role.moe',
+      school_admin: 'role.school_admin',
+      teacher: 'role.teacher',
+      parent: 'role.parent',
+    };
+    return t(roleKeys[role]);
   };
 
   return (
@@ -79,10 +91,10 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       
       {/* Sidebar */}
       <aside 
-        className={`fixed left-0 top-0 h-screen w-72 bg-white border-r border-slate-200 flex flex-col z-50 
+        className={`fixed ${isRTL ? 'right-0' : 'left-0'} top-0 h-screen w-72 bg-white border-${isRTL ? 'l' : 'r'} border-slate-200 flex flex-col z-50 
           transition-transform duration-300 ease-in-out
           lg:translate-x-0 lg:w-64
-          ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+          ${isOpen ? 'translate-x-0' : isRTL ? 'translate-x-full' : '-translate-x-full'}
         `}
       >
         {/* Logo */}
@@ -91,7 +103,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center shadow-lg shadow-purple-500/25">
               <School className="w-6 h-6 text-white" />
             </div>
-            <span className="text-xl font-bold text-slate-900">EduTech</span>
+            <span className="text-xl font-bold text-slate-900">{t('app.name')}</span>
           </Link>
           <button 
             onClick={onClose}
@@ -107,7 +119,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             {filteredNavItems.map((item) => {
               const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href));
               return (
-                <li key={item.name}>
+                <li key={item.nameKey}>
                   <Link
                     href={item.href}
                     onClick={onClose}
@@ -118,9 +130,9 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                     }`}
                   >
                     <item.icon className={`w-5 h-5 ${isActive ? 'text-purple-600' : 'text-slate-400'}`} />
-                    <span>{item.name}</span>
+                    <span>{t(item.nameKey)}</span>
                     {isActive && (
-                      <div className="ml-auto w-1.5 h-1.5 rounded-full bg-purple-600" />
+                      <div className={`${isRTL ? 'mr-auto' : 'ml-auto'} w-1.5 h-1.5 rounded-full bg-purple-600`} />
                     )}
                   </Link>
                 </li>
@@ -137,7 +149,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-slate-900 truncate">{user.name}</p>
-              <p className="text-xs text-slate-500 truncate">{getRoleName(user.role)}</p>
+              <p className="text-xs text-slate-500 truncate">{getRoleNameTranslated(user.role)}</p>
             </div>
           </div>
           <div className="flex gap-2">
@@ -147,7 +159,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 rounded-xl transition-colors"
             >
               <Settings className="w-4 h-4" />
-              Settings
+              {t('nav.settings')}
             </Link>
             <button
               onClick={logout}

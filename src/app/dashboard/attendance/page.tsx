@@ -6,8 +6,10 @@ import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Select } from '@/components/ui/Select';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { db } from '@/lib/db';
 import { format, addDays, subDays } from 'date-fns';
+import { ar, enUS } from 'date-fns/locale';
 import { v4 as uuidv4 } from 'uuid';
 import { 
   CheckCircle, 
@@ -25,6 +27,7 @@ type AttendanceStatus = 'present' | 'absent' | 'late' | 'excused';
 
 export default function AttendancePage() {
   const { user } = useAuth();
+  const { t, isRTL, language } = useLanguage();
   const [classes, setClasses] = useState<Class[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
@@ -36,6 +39,8 @@ export default function AttendancePage() {
   const [existingAttendance, setExistingAttendance] = useState<Attendance[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+
+  const dateLocale = language === 'ar' ? ar : enUS;
 
   useEffect(() => {
     const loadInitialData = async () => {
@@ -148,35 +153,38 @@ export default function AttendancePage() {
     excused: Array.from(attendanceRecords.values()).filter(s => s === 'excused').length,
   };
 
+  const PrevIcon = isRTL ? ChevronRight : ChevronLeft;
+  const NextIcon = isRTL ? ChevronLeft : ChevronRight;
+
   return (
-    <DashboardLayout title="Attendance" subtitle="Take and manage student attendance">
+    <DashboardLayout title={t('attendance.title')} subtitle={t('attendance.subtitle')}>
       {/* Controls */}
       <Card className="mb-6">
         <CardContent className="p-6">
-          <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-end justify-between">
-            <div className="flex flex-col sm:flex-row gap-4 flex-1">
+          <div className={`flex flex-col lg:flex-row gap-4 items-start lg:items-end justify-between ${isRTL ? 'lg:flex-row-reverse' : ''}`}>
+            <div className={`flex flex-col sm:flex-row gap-4 flex-1 ${isRTL ? 'sm:flex-row-reverse' : ''}`}>
               <Select
-                label="Class"
+                label={t('students.class')}
                 value={selectedClass}
                 onChange={(e) => setSelectedClass(e.target.value)}
                 options={classes.map(c => ({ value: c.id, label: c.name }))}
                 className="w-full sm:w-48"
               />
               <Select
-                label="Subject"
+                label={t('schedules.subject')}
                 value={selectedSubject}
                 onChange={(e) => setSelectedSubject(e.target.value)}
                 options={subjects.map(s => ({ value: s.id, label: s.name }))}
                 className="w-full sm:w-48"
               />
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Date</label>
-                <div className="flex items-center gap-2">
+                <label className="block text-sm font-semibold text-slate-700 mb-2">{t('common.date')}</label>
+                <div className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
                   <button
                     onClick={() => setSelectedDate(subDays(selectedDate, 1))}
                     className="p-2 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors"
                   >
-                    <ChevronLeft className="w-4 h-4" />
+                    <PrevIcon className="w-4 h-4" />
                   </button>
                   <input
                     type="date"
@@ -188,14 +196,14 @@ export default function AttendancePage() {
                     onClick={() => setSelectedDate(addDays(selectedDate, 1))}
                     className="p-2 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors"
                   >
-                    <ChevronRight className="w-4 h-4" />
+                    <NextIcon className="w-4 h-4" />
                   </button>
                 </div>
               </div>
             </div>
             <Button onClick={handleSaveAttendance} isLoading={isSaving} disabled={saved}>
-              <Save className="w-4 h-4 mr-2" />
-              {saved ? 'Saved' : 'Save Attendance'}
+              <Save className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+              {saved ? (isRTL ? 'تم الحفظ' : 'Saved') : t('attendance.saveAttendance')}
             </Button>
           </div>
         </CardContent>
@@ -208,7 +216,7 @@ export default function AttendancePage() {
             <CardContent className="p-4 text-center">
               <CheckCircle className="w-8 h-8 mx-auto text-emerald-500 mb-2" />
               <p className="text-2xl font-bold text-emerald-600">{stats.present}</p>
-              <p className="text-sm text-slate-500">Present</p>
+              <p className="text-sm text-slate-500">{t('attendance.present')}</p>
             </CardContent>
           </Card>
         </button>
@@ -217,7 +225,7 @@ export default function AttendancePage() {
             <CardContent className="p-4 text-center">
               <XCircle className="w-8 h-8 mx-auto text-red-500 mb-2" />
               <p className="text-2xl font-bold text-red-600">{stats.absent}</p>
-              <p className="text-sm text-slate-500">Absent</p>
+              <p className="text-sm text-slate-500">{t('attendance.absent')}</p>
             </CardContent>
           </Card>
         </button>
@@ -226,7 +234,7 @@ export default function AttendancePage() {
             <CardContent className="p-4 text-center">
               <Clock className="w-8 h-8 mx-auto text-amber-500 mb-2" />
               <p className="text-2xl font-bold text-amber-600">{stats.late}</p>
-              <p className="text-sm text-slate-500">Late</p>
+              <p className="text-sm text-slate-500">{t('attendance.late')}</p>
             </CardContent>
           </Card>
         </button>
@@ -235,7 +243,7 @@ export default function AttendancePage() {
             <CardContent className="p-4 text-center">
               <Calendar className="w-8 h-8 mx-auto text-blue-500 mb-2" />
               <p className="text-2xl font-bold text-blue-600">{stats.excused}</p>
-              <p className="text-sm text-slate-500">Excused</p>
+              <p className="text-sm text-slate-500">{t('attendance.excused')}</p>
             </CardContent>
           </Card>
         </button>
@@ -244,17 +252,19 @@ export default function AttendancePage() {
       {/* Student List */}
       <Card>
         <CardContent className="p-6">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-lg font-bold text-slate-900">{classes.find(c => c.id === selectedClass)?.name || 'Select a class'}</h2>
-              <p className="text-sm text-slate-500">{format(selectedDate, 'EEEE, MMMM d, yyyy')}</p>
+          <div className={`flex items-center justify-between mb-6 ${isRTL ? 'flex-row-reverse' : ''}`}>
+            <div className={isRTL ? 'text-right' : ''}>
+              <h2 className="text-lg font-bold text-slate-900">
+                {classes.find(c => c.id === selectedClass)?.name || t('attendance.selectClass')}
+              </h2>
+              <p className="text-sm text-slate-500">{format(selectedDate, 'EEEE, MMMM d, yyyy', { locale: dateLocale })}</p>
             </div>
           </div>
           
           {students.length === 0 ? (
             <div className="text-center py-12">
               <AlertTriangle className="w-12 h-12 mx-auto text-slate-300 mb-4" />
-              <p className="text-slate-500">No students found in this class</p>
+              <p className="text-slate-500">{isRTL ? 'لا يوجد طلاب في هذا الفصل' : 'No students found in this class'}</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -263,19 +273,19 @@ export default function AttendancePage() {
                 return (
                   <div
                     key={student.id}
-                    className="flex items-center justify-between p-4 rounded-xl border border-slate-200 hover:border-purple-200 transition-colors"
+                    className={`flex items-center justify-between p-4 rounded-xl border border-slate-200 hover:border-purple-200 transition-colors ${isRTL ? 'flex-row-reverse' : ''}`}
                   >
-                    <div className="flex items-center gap-3">
+                    <div className={`flex items-center gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
                       <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold ${student.gender === 'male' ? 'bg-blue-500' : 'bg-pink-500'}`}>
                         {student.name.charAt(0)}
                       </div>
-                      <div>
+                      <div className={isRTL ? 'text-right' : ''}>
                         <p className="font-semibold text-slate-900">{student.name}</p>
                         <p className="text-sm text-slate-500">{student.studentNumber}</p>
                       </div>
                     </div>
                     
-                    <div className="flex items-center gap-2">
+                    <div className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
                       {(['present', 'absent', 'late', 'excused'] as AttendanceStatus[]).map((status) => (
                         <button
                           key={status}
@@ -288,7 +298,7 @@ export default function AttendancePage() {
                                 'border-blue-500 bg-blue-50'
                               : 'border-slate-200 hover:border-slate-300'
                           }`}
-                          title={status.charAt(0).toUpperCase() + status.slice(1)}
+                          title={t(`attendance.${status}`)}
                         >
                           {status === 'present' && <CheckCircle className={`w-5 h-5 ${currentStatus === status ? 'text-emerald-500' : 'text-slate-300'}`} />}
                           {status === 'absent' && <XCircle className={`w-5 h-5 ${currentStatus === status ? 'text-red-500' : 'text-slate-300'}`} />}

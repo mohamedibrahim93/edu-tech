@@ -4,8 +4,10 @@ import React, { useEffect, useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Card, CardContent } from '@/components/ui/Card';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { db } from '@/lib/db';
 import { format } from 'date-fns';
+import { ar, enUS } from 'date-fns/locale';
 import Link from 'next/link';
 import {
   Users,
@@ -19,6 +21,7 @@ import {
   Clock,
   AlertTriangle,
   ArrowRight,
+  ArrowLeft,
   BarChart3,
   TrendingUp,
 } from 'lucide-react';
@@ -26,6 +29,7 @@ import type { School, Class, Student, Teacher, Attendance, Announcement } from '
 
 export default function DashboardPage() {
   const { user } = useAuth();
+  const { t, isRTL, language } = useLanguage();
   const [schools, setSchools] = useState<School[]>([]);
   const [classes, setClasses] = useState<Class[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
@@ -33,6 +37,8 @@ export default function DashboardPage() {
   const [attendance, setAttendance] = useState<Attendance[]>([]);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [teacher, setTeacher] = useState<Teacher | null>(null);
+
+  const dateLocale = language === 'ar' ? ar : enUS;
 
   useEffect(() => {
     const loadData = async () => {
@@ -88,43 +94,48 @@ export default function DashboardPage() {
 
   if (!user) return null;
 
+  const Arrow = isRTL ? ArrowLeft : ArrowRight;
+
   return (
-    <DashboardLayout title={`Welcome back, ${user.name.split(' ')[0]}!`} subtitle={format(new Date(), 'EEEE, MMMM d, yyyy')}>
+    <DashboardLayout 
+      title={`${t('dashboard.welcome')}، ${user.name.split(' ')[0]}!`} 
+      subtitle={format(new Date(), 'EEEE, MMMM d, yyyy', { locale: dateLocale })}
+    >
       <div className="space-y-6">
         {/* Stats Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
           {user.role === 'moe' && (
             <>
-              <StatCard title="Total Schools" value={schools.length} icon={Building2} color="purple" change="+2 this month" />
-              <StatCard title="Total Students" value={students.length.toLocaleString()} icon={GraduationCap} color="blue" change="+12%" />
-              <StatCard title="Total Teachers" value={teachers.length} icon={Users} color="emerald" />
-              <StatCard title="Active Classes" value={schools.length * 3} icon={BookOpen} color="pink" />
+              <StatCard title={t('dashboard.totalSchools')} value={schools.length} icon={Building2} color="purple" change={isRTL ? '+2 هذا الشهر' : '+2 this month'} isRTL={isRTL} />
+              <StatCard title={t('dashboard.totalStudents')} value={students.length.toLocaleString()} icon={GraduationCap} color="blue" change="+12%" isRTL={isRTL} />
+              <StatCard title={t('dashboard.totalTeachers')} value={teachers.length} icon={Users} color="emerald" isRTL={isRTL} />
+              <StatCard title={t('dashboard.activeClasses')} value={schools.length * 3} icon={BookOpen} color="pink" isRTL={isRTL} />
             </>
           )}
           
           {user.role === 'school_admin' && (
             <>
-              <StatCard title="Total Students" value={students.length} icon={GraduationCap} color="purple" />
-              <StatCard title="Total Teachers" value={teachers.length} icon={Users} color="blue" />
-              <StatCard title="Active Classes" value={classes.length} icon={BookOpen} color="emerald" />
-              <StatCard title="Attendance Rate" value={`${attendanceRate}%`} icon={CheckCircle} color="pink" change="+5%" />
+              <StatCard title={t('dashboard.totalStudents')} value={students.length} icon={GraduationCap} color="purple" isRTL={isRTL} />
+              <StatCard title={t('dashboard.totalTeachers')} value={teachers.length} icon={Users} color="blue" isRTL={isRTL} />
+              <StatCard title={t('dashboard.activeClasses')} value={classes.length} icon={BookOpen} color="emerald" isRTL={isRTL} />
+              <StatCard title={t('dashboard.attendanceRate')} value={`${attendanceRate}%`} icon={CheckCircle} color="pink" change="+5%" isRTL={isRTL} />
             </>
           )}
           
           {user.role === 'teacher' && (
             <>
-              <StatCard title="My Subjects" value={teacher?.subjects.length || 0} icon={BookOpen} color="purple" />
-              <StatCard title="Today's Classes" value={classes.length} icon={Calendar} color="blue" />
-              <StatCard title="Attendance Taken" value={todayAttendance.length} icon={CheckCircle} color="emerald" />
-              <StatCard title="Supervisor" value={teacher?.isSupervisor ? 'Yes' : 'No'} icon={Users} color="pink" />
+              <StatCard title={t('dashboard.mySubjects')} value={teacher?.subjects.length || 0} icon={BookOpen} color="purple" isRTL={isRTL} />
+              <StatCard title={t('dashboard.todayClasses')} value={classes.length} icon={Calendar} color="blue" isRTL={isRTL} />
+              <StatCard title={t('dashboard.attendanceTaken')} value={todayAttendance.length} icon={CheckCircle} color="emerald" isRTL={isRTL} />
+              <StatCard title={t('dashboard.supervisor')} value={teacher?.isSupervisor ? t('common.yes') : t('common.no')} icon={Users} color="pink" isRTL={isRTL} />
             </>
           )}
           
           {user.role === 'parent' && (
             <>
-              <StatCard title="My Children" value={students.length} icon={GraduationCap} color="purple" />
-              <StatCard title="Announcements" value={announcements.length} icon={Bell} color="blue" />
-              <StatCard title="Pending Requests" value="0" icon={Clock} color="pink" />
+              <StatCard title={t('dashboard.myChildren')} value={students.length} icon={GraduationCap} color="purple" isRTL={isRTL} />
+              <StatCard title={t('nav.announcements')} value={announcements.length} icon={Bell} color="blue" isRTL={isRTL} />
+              <StatCard title={t('dashboard.pendingRequests')} value="0" icon={Clock} color="pink" isRTL={isRTL} />
             </>
           )}
         </div>
@@ -134,38 +145,38 @@ export default function DashboardPage() {
           <div className="lg:col-span-2">
             <Card>
               <CardContent className="p-4 sm:p-6">
-                <h2 className="text-lg font-bold text-slate-900 mb-4 sm:mb-6">Quick Actions</h2>
+                <h2 className="text-lg font-bold text-slate-900 mb-4 sm:mb-6">{t('dashboard.quickActions')}</h2>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
                   {user.role === 'teacher' && (
                     <>
-                      <QuickAction href="/dashboard/attendance" icon={CheckCircle} label="Take Attendance" color="purple" />
-                      <QuickAction href="/dashboard/students" icon={GraduationCap} label="View Students" color="blue" />
-                      <QuickAction href="/dashboard/classes" icon={BookOpen} label="My Classes" color="emerald" />
-                      <QuickAction href="/dashboard/issues" icon={AlertTriangle} label="Report Issue" color="pink" />
+                      <QuickAction href="/dashboard/attendance" icon={CheckCircle} label={t('attendance.takeAttendance')} color="purple" />
+                      <QuickAction href="/dashboard/students" icon={GraduationCap} label={t('nav.students')} color="blue" />
+                      <QuickAction href="/dashboard/classes" icon={BookOpen} label={t('nav.classes')} color="emerald" />
+                      <QuickAction href="/dashboard/issues" icon={AlertTriangle} label={t('issues.reportIssue')} color="pink" />
                     </>
                   )}
                   {user.role === 'school_admin' && (
                     <>
-                      <QuickAction href="/dashboard/students" icon={GraduationCap} label="Students" color="purple" />
-                      <QuickAction href="/dashboard/teachers" icon={Users} label="Teachers" color="blue" />
-                      <QuickAction href="/dashboard/classes" icon={BookOpen} label="Classes" color="emerald" />
-                      <QuickAction href="/dashboard/reports" icon={BarChart3} label="Reports" color="pink" />
+                      <QuickAction href="/dashboard/students" icon={GraduationCap} label={t('nav.students')} color="purple" />
+                      <QuickAction href="/dashboard/teachers" icon={Users} label={t('nav.teachers')} color="blue" />
+                      <QuickAction href="/dashboard/classes" icon={BookOpen} label={t('nav.classes')} color="emerald" />
+                      <QuickAction href="/dashboard/reports" icon={BarChart3} label={t('nav.reports')} color="pink" />
                     </>
                   )}
                   {user.role === 'parent' && (
                     <>
-                      <QuickAction href="/dashboard/absence-requests" icon={Calendar} label="Request Absence" color="purple" />
-                      <QuickAction href="/dashboard/my-children" icon={GraduationCap} label="My Children" color="blue" />
-                      <QuickAction href="/dashboard/announcements" icon={Bell} label="Announcements" color="emerald" />
-                      <QuickAction href="/dashboard/issues" icon={AlertTriangle} label="Report Issue" color="pink" />
+                      <QuickAction href="/dashboard/absence-requests" icon={Calendar} label={t('absenceRequests.newRequest')} color="purple" />
+                      <QuickAction href="/dashboard/my-children" icon={GraduationCap} label={t('nav.myChildren')} color="blue" />
+                      <QuickAction href="/dashboard/announcements" icon={Bell} label={t('nav.announcements')} color="emerald" />
+                      <QuickAction href="/dashboard/issues" icon={AlertTriangle} label={t('issues.reportIssue')} color="pink" />
                     </>
                   )}
                   {user.role === 'moe' && (
                     <>
-                      <QuickAction href="/dashboard/schools" icon={Building2} label="Schools" color="purple" />
-                      <QuickAction href="/dashboard/teachers" icon={Users} label="Teachers" color="blue" />
-                      <QuickAction href="/dashboard/reports" icon={BarChart3} label="Reports" color="emerald" />
-                      <QuickAction href="/dashboard/announcements" icon={Bell} label="Announcements" color="pink" />
+                      <QuickAction href="/dashboard/schools" icon={Building2} label={t('nav.schools')} color="purple" />
+                      <QuickAction href="/dashboard/teachers" icon={Users} label={t('nav.teachers')} color="blue" />
+                      <QuickAction href="/dashboard/reports" icon={BarChart3} label={t('nav.reports')} color="emerald" />
+                      <QuickAction href="/dashboard/announcements" icon={Bell} label={t('nav.announcements')} color="pink" />
                     </>
                   )}
                 </div>
@@ -177,7 +188,7 @@ export default function DashboardPage() {
           {(user.role === 'school_admin' || user.role === 'teacher') && (
             <Card>
               <CardContent className="p-4 sm:p-6">
-                <h2 className="text-lg font-bold text-slate-900 mb-4 sm:mb-6">Today&apos;s Attendance</h2>
+                <h2 className="text-lg font-bold text-slate-900 mb-4 sm:mb-6">{t('dashboard.todayAttendance')}</h2>
                 <div className="flex items-center justify-center mb-4 sm:mb-6">
                   <div className="relative w-28 h-28 sm:w-32 sm:h-32">
                     <svg className="w-full h-full -rotate-90">
@@ -208,12 +219,12 @@ export default function DashboardPage() {
                   <div className="p-3 rounded-xl bg-emerald-50 text-center">
                     <CheckCircle className="w-5 h-5 mx-auto text-emerald-600 mb-1" />
                     <p className="text-lg font-bold text-emerald-600">{todayAttendance.filter(a => a.status === 'present').length}</p>
-                    <p className="text-xs text-emerald-600">Present</p>
+                    <p className="text-xs text-emerald-600">{t('attendance.present')}</p>
                   </div>
                   <div className="p-3 rounded-xl bg-red-50 text-center">
                     <XCircle className="w-5 h-5 mx-auto text-red-600 mb-1" />
                     <p className="text-lg font-bold text-red-600">{todayAttendance.filter(a => a.status === 'absent').length}</p>
-                    <p className="text-xs text-red-600">Absent</p>
+                    <p className="text-xs text-red-600">{t('attendance.absent')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -224,10 +235,10 @@ export default function DashboardPage() {
           {user.role !== 'school_admin' && user.role !== 'teacher' && (
             <Card>
               <CardContent className="p-4 sm:p-6 text-center">
-                <h2 className="text-lg font-bold text-slate-900 mb-4">Today</h2>
+                <h2 className="text-lg font-bold text-slate-900 mb-4">{t('dashboard.today')}</h2>
                 <p className="text-4xl sm:text-5xl font-bold text-slate-900 mb-2">{format(new Date(), 'd')}</p>
-                <p className="text-purple-600 font-semibold">{format(new Date(), 'MMMM yyyy')}</p>
-                <p className="text-slate-500 mt-2">{format(new Date(), 'EEEE')}</p>
+                <p className="text-purple-600 font-semibold">{format(new Date(), 'MMMM yyyy', { locale: dateLocale })}</p>
+                <p className="text-slate-500 mt-2">{format(new Date(), 'EEEE', { locale: dateLocale })}</p>
               </CardContent>
             </Card>
           )}
@@ -237,10 +248,10 @@ export default function DashboardPage() {
         <Card>
           <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between mb-4 sm:mb-6">
-              <h2 className="text-lg font-bold text-slate-900">Recent Announcements</h2>
+              <h2 className="text-lg font-bold text-slate-900">{t('dashboard.recentAnnouncements')}</h2>
               <Link href="/dashboard/announcements" className="text-sm font-semibold text-purple-600 hover:text-purple-700 flex items-center gap-1">
-                View All
-                <ArrowRight className="w-4 h-4" />
+                {t('common.viewAll')}
+                <Arrow className="w-4 h-4" />
               </Link>
             </div>
             
@@ -249,7 +260,7 @@ export default function DashboardPage() {
                 <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-50 flex items-center justify-center">
                   <Bell className="w-8 h-8 text-slate-300" />
                 </div>
-                <p className="text-slate-500">No announcements yet</p>
+                <p className="text-slate-500">{t('dashboard.noAnnouncements')}</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -261,7 +272,7 @@ export default function DashboardPage() {
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold text-slate-900 text-sm sm:text-base">{announcement.title}</p>
                       <p className="text-sm text-slate-500 truncate">{announcement.content}</p>
-                      <p className="text-xs text-slate-400 mt-1">{format(new Date(announcement.createdAt), 'MMM d, yyyy')}</p>
+                      <p className="text-xs text-slate-400 mt-1">{format(new Date(announcement.createdAt), 'MMM d, yyyy', { locale: dateLocale })}</p>
                     </div>
                   </div>
                 ))}
@@ -274,7 +285,7 @@ export default function DashboardPage() {
   );
 }
 
-function StatCard({ title, value, icon: Icon, color, change }: { title: string; value: string | number; icon: React.ElementType; color: string; change?: string }) {
+function StatCard({ title, value, icon: Icon, color, change, isRTL }: { title: string; value: string | number; icon: React.ElementType; color: string; change?: string; isRTL: boolean }) {
   const colors: Record<string, { bg: string; text: string; icon: string; shadow: string }> = {
     purple: { bg: 'bg-purple-50', text: 'text-purple-600', icon: 'from-purple-600 to-pink-600', shadow: 'shadow-purple-500/25' },
     blue: { bg: 'bg-blue-50', text: 'text-blue-600', icon: 'from-blue-600 to-cyan-600', shadow: 'shadow-blue-500/25' },
@@ -287,7 +298,7 @@ function StatCard({ title, value, icon: Icon, color, change }: { title: string; 
   return (
     <Card>
       <CardContent className="p-4 sm:p-6">
-        <div className="flex items-start justify-between mb-3 sm:mb-4">
+        <div className={`flex items-start justify-between mb-3 sm:mb-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
           <div className={`p-2.5 sm:p-3 rounded-xl bg-gradient-to-br ${c.icon} shadow-lg ${c.shadow}`}>
             <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
           </div>

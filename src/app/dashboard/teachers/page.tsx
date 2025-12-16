@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Modal } from '@/components/ui/Modal';
 import { Table } from '@/components/ui/Table';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { db } from '@/lib/db';
 import { format } from 'date-fns';
 import { v4 as uuidv4 } from 'uuid';
@@ -22,6 +23,7 @@ interface TeacherWithUser extends Teacher {
 
 export default function TeachersPage() {
   const { user } = useAuth();
+  const { t, isRTL } = useLanguage();
   const [teachers, setTeachers] = useState<TeacherWithUser[]>([]);
   const [schools, setSchools] = useState<School[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -134,7 +136,7 @@ export default function TeachersPage() {
   };
 
   const handleDelete = async (teacher: TeacherWithUser) => {
-    if (confirm('Are you sure you want to delete this teacher?')) {
+    if (confirm(isRTL ? 'هل أنت متأكد من حذف هذا المعلم؟' : 'Are you sure you want to delete this teacher?')) {
       await db.teachers.delete(teacher.id);
       await db.users.delete(teacher.userId);
       loadData();
@@ -144,13 +146,13 @@ export default function TeachersPage() {
   const columns = [
     {
       key: 'name',
-      header: 'Teacher',
+      header: t('role.teacher'),
       render: (teacher: TeacherWithUser) => (
-        <div className="flex items-center gap-3">
+        <div className={`flex items-center gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white font-semibold">
             {teacher.user?.name.charAt(0) || 'T'}
           </div>
-          <div>
+          <div className={isRTL ? 'text-right' : ''}>
             <p className="font-medium text-slate-900">{teacher.user?.name}</p>
             <p className="text-sm text-slate-500">{teacher.user?.email}</p>
           </div>
@@ -159,7 +161,7 @@ export default function TeachersPage() {
     },
     {
       key: 'subjects',
-      header: 'Subjects',
+      header: t('teachers.subjects'),
       render: (teacher: TeacherWithUser) => (
         <div className="flex flex-wrap gap-1">
           {teacher.subjects.slice(0, 3).map((subject) => (
@@ -173,37 +175,37 @@ export default function TeachersPage() {
     },
     {
       key: 'role',
-      header: 'Role',
+      header: isRTL ? 'الدور' : 'Role',
       render: (teacher: TeacherWithUser) => (
         <Badge variant={teacher.isSupervisor ? 'success' : 'default'}>
           {teacher.isSupervisor ? (
-            <span className="flex items-center gap-1">
+            <span className={`flex items-center gap-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
               <Shield className="w-3 h-3" />
-              Supervisor
+              {t('dashboard.supervisor')}
             </span>
-          ) : 'Teacher'}
+          ) : t('role.teacher')}
         </Badge>
       ),
     },
     {
       key: 'school',
-      header: 'School',
+      header: isRTL ? 'المدرسة' : 'School',
       render: (teacher: TeacherWithUser) => (
-        <span className="text-sm">{teacher.school?.name || 'N/A'}</span>
+        <span className="text-sm">{teacher.school?.name || (isRTL ? 'غير متوفر' : 'N/A')}</span>
       ),
     },
     {
       key: 'status',
-      header: 'Status',
+      header: t('common.status'),
       render: (teacher: TeacherWithUser) => (
         <Badge variant={teacher.isActive ? 'success' : 'danger'}>
-          {teacher.isActive ? 'Active' : 'Inactive'}
+          {teacher.isActive ? t('common.active') : t('common.inactive')}
         </Badge>
       ),
     },
     {
       key: 'actions',
-      header: 'Actions',
+      header: t('common.actions'),
       render: (teacher: TeacherWithUser) => (
         <div className="flex items-center gap-2">
           <button
@@ -224,23 +226,23 @@ export default function TeachersPage() {
   ];
 
   return (
-    <DashboardLayout title="Teachers" subtitle="Manage teacher accounts and assignments">
+    <DashboardLayout title={t('teachers.title')} subtitle={t('teachers.subtitle')}>
       <Card className="p-4 sm:p-6">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        <div className={`flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 ${isRTL ? 'md:flex-row-reverse' : ''}`}>
           <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Search className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400`} />
             <input
               type="text"
-              placeholder="Search teachers..."
+              placeholder={`${t('common.search')}...`}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all"
+              className={`w-full ${isRTL ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-2 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all`}
             />
           </div>
           {user?.role === 'school_admin' && (
             <Button onClick={() => setIsModalOpen(true)}>
-              <Plus className="w-4 h-4 mr-2" />
-              Add Teacher
+              <Plus className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+              {t('teachers.addTeacher')}
             </Button>
           )}
         </div>
@@ -249,7 +251,7 @@ export default function TeachersPage() {
           data={filteredTeachers}
           columns={columns}
           keyExtractor={(teacher) => teacher.id}
-          emptyMessage="No teachers found"
+          emptyMessage={isRTL ? 'لا يوجد معلمين' : 'No teachers found'}
         />
       </Card>
 
@@ -261,51 +263,53 @@ export default function TeachersPage() {
           setEditingTeacher(null);
           setFormData({ name: '', email: '', password: '', subjects: '', isSupervisor: false });
         }}
-        title={editingTeacher ? 'Edit Teacher' : 'Add New Teacher'}
+        title={editingTeacher ? t('teachers.editTeacher') : t('teachers.addTeacher')}
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
-            label="Full Name"
+            label={t('students.fullName')}
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             required
           />
           <Input
-            label="Email"
+            label={t('common.email')}
             type="email"
             value={formData.email}
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
             required
           />
           <Input
-            label={editingTeacher ? 'New Password (leave blank to keep current)' : 'Password'}
+            label={editingTeacher 
+              ? (isRTL ? 'كلمة المرور الجديدة (اتركه فارغاً للإبقاء على الحالية)' : 'New Password (leave blank to keep current)') 
+              : t('auth.password')}
             type="password"
             value={formData.password}
             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
             required={!editingTeacher}
           />
           <Input
-            label="Subjects (comma separated)"
+            label={isRTL ? 'المواد (مفصولة بفواصل)' : 'Subjects (comma separated)'}
             value={formData.subjects}
             onChange={(e) => setFormData({ ...formData, subjects: e.target.value })}
-            placeholder="Math, Physics, Chemistry"
+            placeholder={t('teachers.subjectsPlaceholder')}
             required
           />
-          <label className="flex items-center gap-2 cursor-pointer">
+          <label className={`flex items-center gap-2 cursor-pointer ${isRTL ? 'flex-row-reverse' : ''}`}>
             <input
               type="checkbox"
               checked={formData.isSupervisor}
               onChange={(e) => setFormData({ ...formData, isSupervisor: e.target.checked })}
               className="w-4 h-4 rounded border-slate-300 text-purple-600 focus:ring-purple-500"
             />
-            <span className="text-sm text-slate-700">Is Supervisor</span>
+            <span className="text-sm text-slate-700">{t('teachers.isSupervisor')}</span>
           </label>
-          <div className="flex justify-end gap-3 pt-4">
+          <div className={`flex justify-end gap-3 pt-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
             <Button type="button" variant="secondary" onClick={() => setIsModalOpen(false)}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button type="submit">
-              {editingTeacher ? 'Update' : 'Add'} Teacher
+              {editingTeacher ? t('common.update') : t('common.add')} {t('role.teacher')}
             </Button>
           </div>
         </form>
@@ -313,4 +317,3 @@ export default function TeachersPage() {
     </DashboardLayout>
   );
 }
-

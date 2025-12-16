@@ -9,6 +9,7 @@ import { Select } from '@/components/ui/Select';
 import { Badge } from '@/components/ui/Badge';
 import { Modal } from '@/components/ui/Modal';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { db } from '@/lib/db';
 import { v4 as uuidv4 } from 'uuid';
 import { Plus, BookOpen, Users, GraduationCap, Edit, Trash2 } from 'lucide-react';
@@ -16,6 +17,7 @@ import type { Class, Student, Teacher, User } from '@/lib/types';
 
 export default function ClassesPage() {
   const { user } = useAuth();
+  const { t, isRTL } = useLanguage();
   const [classes, setClasses] = useState<Class[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
   const [teachers, setTeachers] = useState<Teacher[]>([]);
@@ -95,7 +97,7 @@ export default function ClassesPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (confirm('Are you sure you want to delete this class?')) {
+    if (confirm(isRTL ? 'هل أنت متأكد من حذف هذا الفصل؟' : 'Are you sure you want to delete this class?')) {
       await db.classes.delete(id);
       loadData();
     }
@@ -105,17 +107,26 @@ export default function ClassesPage() {
     return students.filter(s => s.classId === classId).length;
   };
 
+  const getMobilityLabel = (level: string) => {
+    switch (level) {
+      case 'low': return t('classes.low');
+      case 'medium': return t('classes.medium');
+      case 'high': return t('classes.high');
+      default: return level;
+    }
+  };
+
   return (
-    <DashboardLayout title="Classes" subtitle="Manage class records and assignments">
-      <div className="flex justify-between items-center mb-6">
+    <DashboardLayout title={t('classes.title')} subtitle={t('classes.subtitle')}>
+      <div className={`flex justify-between items-center mb-6 ${isRTL ? 'flex-row-reverse' : ''}`}>
         <div className="flex items-center gap-4">
-          <Badge variant="info" size="md">{classes.length} Classes</Badge>
-          <Badge variant="success" size="md">{students.length} Students</Badge>
+          <Badge variant="info" size="md">{classes.length} {t('nav.classes')}</Badge>
+          <Badge variant="success" size="md">{students.length} {t('nav.students')}</Badge>
         </div>
         {user?.role === 'school_admin' && (
           <Button onClick={() => setIsModalOpen(true)}>
-            <Plus className="w-4 h-4 mr-2" />
-            Add Class
+            <Plus className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+            {t('classes.addClass')}
           </Button>
         )}
       </div>
@@ -128,14 +139,14 @@ export default function ClassesPage() {
           
           return (
             <Card key={cls.id} hover className="p-4 sm:p-5">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center gap-3">
+              <div className={`flex items-start justify-between mb-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <div className={`flex items-center gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
                   <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
                     <BookOpen className="w-6 h-6 text-white" />
                   </div>
-                  <div>
+                  <div className={isRTL ? 'text-right' : ''}>
                     <h3 className="font-semibold text-slate-900">{cls.name}</h3>
-                    <p className="text-sm text-slate-500">Grade {cls.grade}</p>
+                    <p className="text-sm text-slate-500">{t('myChildren.grade')} {cls.grade}</p>
                   </div>
                 </div>
                 {user?.role === 'school_admin' && (
@@ -157,10 +168,10 @@ export default function ClassesPage() {
               </div>
 
               <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 rounded-lg bg-slate-50">
-                  <div className="flex items-center gap-2 text-sm text-slate-600">
+                <div className={`flex items-center justify-between p-3 rounded-lg bg-slate-50 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                  <div className={`flex items-center gap-2 text-sm text-slate-600 ${isRTL ? 'flex-row-reverse' : ''}`}>
                     <GraduationCap className="w-4 h-4" />
-                    <span>Students</span>
+                    <span>{t('nav.students')}</span>
                   </div>
                   <span className="font-semibold text-slate-900">{classStudents.length}</span>
                 </div>
@@ -168,28 +179,28 @@ export default function ClassesPage() {
                 <div className="flex gap-2">
                   <div className="flex-1 p-2 rounded-lg bg-blue-50 text-center">
                     <p className="text-lg font-bold text-blue-600">{maleCount}</p>
-                    <p className="text-xs text-blue-600/70">Male</p>
+                    <p className="text-xs text-blue-600/70">{t('students.male')}</p>
                   </div>
                   <div className="flex-1 p-2 rounded-lg bg-pink-50 text-center">
                     <p className="text-lg font-bold text-pink-600">{femaleCount}</p>
-                    <p className="text-xs text-pink-600/70">Female</p>
+                    <p className="text-xs text-pink-600/70">{t('students.female')}</p>
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between pt-3 border-t border-slate-200">
-                  <span className="text-sm text-slate-500">Mobility Level</span>
+                <div className={`flex items-center justify-between pt-3 border-t border-slate-200 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                  <span className="text-sm text-slate-500">{t('classes.mobilityLevel')}</span>
                   <Badge 
                     variant={cls.mobilityLevel === 'high' ? 'success' : cls.mobilityLevel === 'medium' ? 'warning' : 'default'}
                     size="sm"
                   >
-                    {cls.mobilityLevel.charAt(0).toUpperCase() + cls.mobilityLevel.slice(1)}
+                    {getMobilityLabel(cls.mobilityLevel)}
                   </Badge>
                 </div>
 
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-slate-500">Status</span>
+                <div className={`flex items-center justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
+                  <span className="text-sm text-slate-500">{t('common.status')}</span>
                   <Badge variant={cls.isActive ? 'success' : 'danger'} size="sm">
-                    {cls.isActive ? 'Active' : 'Inactive'}
+                    {cls.isActive ? t('common.active') : t('common.inactive')}
                   </Badge>
                 </div>
               </div>
@@ -202,12 +213,12 @@ export default function ClassesPage() {
         <Card className="p-4 sm:p-6">
           <div className="text-center py-12">
             <BookOpen className="w-12 h-12 mx-auto text-slate-400 mb-4" />
-            <h3 className="text-lg font-medium text-slate-900 mb-2">No Classes Found</h3>
-            <p className="text-slate-500 mb-4">Get started by creating your first class.</p>
+            <h3 className="text-lg font-medium text-slate-900 mb-2">{t('classes.noClasses')}</h3>
+            <p className="text-slate-500 mb-4">{t('classes.noClassesDesc')}</p>
             {user?.role === 'school_admin' && (
               <Button onClick={() => setIsModalOpen(true)}>
-                <Plus className="w-4 h-4 mr-2" />
-                Add Class
+                <Plus className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+                {t('classes.addClass')}
               </Button>
             )}
           </div>
@@ -222,39 +233,39 @@ export default function ClassesPage() {
           setEditingClass(null);
           setFormData({ name: '', grade: '', mobilityLevel: 'medium' });
         }}
-        title={editingClass ? 'Edit Class' : 'Add New Class'}
+        title={editingClass ? t('classes.editClass') : t('classes.addClass')}
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
-            label="Class Name"
+            label={t('classes.className')}
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            placeholder="e.g., Grade 10 - Section A"
+            placeholder={isRTL ? 'مثال: الصف العاشر - أ' : 'e.g., Grade 10 - Section A'}
             required
           />
           <Input
-            label="Grade Level"
+            label={t('classes.gradeLevel')}
             value={formData.grade}
             onChange={(e) => setFormData({ ...formData, grade: e.target.value })}
-            placeholder="e.g., 10"
+            placeholder={isRTL ? 'مثال: 10' : 'e.g., 10'}
             required
           />
           <Select
-            label="Mobility Level"
+            label={t('classes.mobilityLevel')}
             value={formData.mobilityLevel}
             onChange={(e) => setFormData({ ...formData, mobilityLevel: e.target.value as 'low' | 'medium' | 'high' })}
             options={[
-              { value: 'low', label: 'Low' },
-              { value: 'medium', label: 'Medium' },
-              { value: 'high', label: 'High' },
+              { value: 'low', label: t('classes.low') },
+              { value: 'medium', label: t('classes.medium') },
+              { value: 'high', label: t('classes.high') },
             ]}
           />
-          <div className="flex justify-end gap-3 pt-4">
+          <div className={`flex justify-end gap-3 pt-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
             <Button type="button" variant="secondary" onClick={() => setIsModalOpen(false)}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button type="submit">
-              {editingClass ? 'Update' : 'Add'} Class
+              {editingClass ? t('common.update') : t('common.add')} {t('nav.classes')}
             </Button>
           </div>
         </form>
@@ -262,4 +273,3 @@ export default function ClassesPage() {
     </DashboardLayout>
   );
 }
-

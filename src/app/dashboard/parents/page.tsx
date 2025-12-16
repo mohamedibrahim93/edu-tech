@@ -9,8 +9,10 @@ import { Badge } from '@/components/ui/Badge';
 import { Modal } from '@/components/ui/Modal';
 import { Table } from '@/components/ui/Table';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { db } from '@/lib/db';
 import { format } from 'date-fns';
+import { ar, enUS } from 'date-fns/locale';
 import { v4 as uuidv4 } from 'uuid';
 import { Plus, Search, Edit, Trash2, Check, X, Users, GraduationCap } from 'lucide-react';
 import type { Parent, User, Student } from '@/lib/types';
@@ -22,11 +24,14 @@ interface ParentWithDetails extends Parent {
 
 export default function ParentsPage() {
   const { user } = useAuth();
+  const { t, isRTL, language } = useLanguage();
   const [parents, setParents] = useState<ParentWithDetails[]>([]);
   const [allStudents, setAllStudents] = useState<Student[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingParent, setEditingParent] = useState<ParentWithDetails | null>(null);
+  
+  const dateLocale = language === 'ar' ? ar : enUS;
   
   const [formData, setFormData] = useState({
     name: '',
@@ -128,7 +133,7 @@ export default function ParentsPage() {
   };
 
   const handleDelete = async (parent: ParentWithDetails) => {
-    if (confirm('Are you sure you want to delete this parent account?')) {
+    if (confirm(isRTL ? 'هل أنت متأكد من حذف حساب ولي الأمر هذا؟' : 'Are you sure you want to delete this parent account?')) {
       await db.parents.delete(parent.id);
       await db.users.delete(parent.userId);
       loadData();
@@ -152,13 +157,13 @@ export default function ParentsPage() {
   const columns = [
     {
       key: 'name',
-      header: 'Parent',
+      header: t('role.parent'),
       render: (parent: ParentWithDetails) => (
-        <div className="flex items-center gap-3">
+        <div className={`flex items-center gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white font-semibold">
             {parent.user?.name.charAt(0) || 'P'}
           </div>
-          <div>
+          <div className={isRTL ? 'text-right' : ''}>
             <p className="font-medium text-slate-900">{parent.user?.name}</p>
             <p className="text-sm text-slate-500">{parent.user?.email}</p>
           </div>
@@ -167,42 +172,42 @@ export default function ParentsPage() {
     },
     {
       key: 'children',
-      header: 'Children',
+      header: isRTL ? 'الأبناء' : 'Children',
       render: (parent: ParentWithDetails) => (
         <div className="flex flex-wrap gap-1">
           {parent.students.map((student) => (
             <Badge key={student.id} variant="info" size="sm">{student.name}</Badge>
           ))}
           {parent.students.length === 0 && (
-            <span className="text-sm text-slate-500">No children linked</span>
+            <span className="text-sm text-slate-500">{t('parents.noChildren')}</span>
           )}
         </div>
       ),
     },
     {
       key: 'status',
-      header: 'Status',
+      header: t('common.status'),
       render: (parent: ParentWithDetails) => (
         <Badge variant={parent.isApproved ? 'success' : 'warning'}>
-          {parent.isApproved ? 'Approved' : 'Pending'}
+          {parent.isApproved ? t('parents.approved') : t('parents.pending')}
         </Badge>
       ),
     },
     {
       key: 'createdAt',
-      header: 'Registered',
-      render: (parent: ParentWithDetails) => format(new Date(parent.createdAt), 'MMM d, yyyy'),
+      header: isRTL ? 'تاريخ التسجيل' : 'Registered',
+      render: (parent: ParentWithDetails) => format(new Date(parent.createdAt), 'MMM d, yyyy', { locale: dateLocale }),
     },
     {
       key: 'actions',
-      header: 'Actions',
+      header: t('common.actions'),
       render: (parent: ParentWithDetails) => (
-        <div className="flex items-center gap-2">
+        <div className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
           {!parent.isApproved && (
             <button
               onClick={() => handleApprove(parent)}
               className="p-2 hover:bg-emerald-50 rounded-lg transition-colors"
-              title="Approve"
+              title={isRTL ? 'موافقة' : 'Approve'}
             >
               <Check className="w-4 h-4 text-emerald-500" />
             </button>
@@ -226,11 +231,13 @@ export default function ParentsPage() {
 
   if (user?.role !== 'school_admin') {
     return (
-      <DashboardLayout title="Parents" subtitle="Manage parent accounts">
+      <DashboardLayout title={t('parents.title')} subtitle={t('parents.subtitle')}>
         <Card className="p-4 sm:p-6">
           <div className="text-center py-12">
             <Users className="w-12 h-12 mx-auto text-slate-400 mb-4" />
-            <p className="text-slate-500">You don't have permission to view this page.</p>
+            <p className="text-slate-500">
+              {isRTL ? 'ليس لديك صلاحية لعرض هذه الصفحة.' : "You don't have permission to view this page."}
+            </p>
           </div>
         </Card>
       </DashboardLayout>
@@ -238,22 +245,22 @@ export default function ParentsPage() {
   }
 
   return (
-    <DashboardLayout title="Parents" subtitle="Manage parent accounts and approvals">
+    <DashboardLayout title={t('parents.title')} subtitle={t('parents.subtitle')}>
       <Card className="p-4 sm:p-6">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        <div className={`flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 ${isRTL ? 'md:flex-row-reverse' : ''}`}>
           <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Search className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400`} />
             <input
               type="text"
-              placeholder="Search parents..."
+              placeholder={`${t('common.search')}...`}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all"
+              className={`w-full ${isRTL ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-2 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all`}
             />
           </div>
           <Button onClick={() => setIsModalOpen(true)}>
-            <Plus className="w-4 h-4 mr-2" />
-            Add Parent
+            <Plus className={`w-4 h-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+            {t('parents.addParent')}
           </Button>
         </div>
 
@@ -261,7 +268,7 @@ export default function ParentsPage() {
           data={filteredParents}
           columns={columns}
           keyExtractor={(parent) => parent.id}
-          emptyMessage="No parents found"
+          emptyMessage={isRTL ? 'لا يوجد أولياء أمور' : 'No parents found'}
         />
       </Card>
 
@@ -273,25 +280,27 @@ export default function ParentsPage() {
           setEditingParent(null);
           setFormData({ name: '', email: '', password: '', studentIds: [] });
         }}
-        title={editingParent ? 'Edit Parent' : 'Add New Parent'}
+        title={editingParent ? t('parents.editParent') : t('parents.addParent')}
         size="lg"
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
-            label="Full Name"
+            label={t('students.fullName')}
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             required
           />
           <Input
-            label="Email"
+            label={t('common.email')}
             type="email"
             value={formData.email}
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
             required
           />
           <Input
-            label={editingParent ? 'New Password (leave blank to keep current)' : 'Password'}
+            label={editingParent 
+              ? (isRTL ? 'كلمة المرور الجديدة (اتركها فارغة للإبقاء على الحالية)' : 'New Password (leave blank to keep current)') 
+              : t('auth.password')}
             type="password"
             value={formData.password}
             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
@@ -299,14 +308,14 @@ export default function ParentsPage() {
           />
           
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">
-              Link Children
+            <label className={`block text-sm font-semibold text-slate-700 mb-2 ${isRTL ? 'text-right' : ''}`}>
+              {t('parents.linkChildren')}
             </label>
             <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-3 rounded-xl border border-slate-200">
               {allStudents.map((student) => (
                 <label
                   key={student.id}
-                  className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-colors ${
+                  className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-colors ${isRTL ? 'flex-row-reverse' : ''} ${
                     formData.studentIds.includes(student.id)
                       ? 'bg-purple-50 border border-purple-200'
                       : 'hover:bg-slate-50'
@@ -318,7 +327,7 @@ export default function ParentsPage() {
                     onChange={() => toggleStudent(student.id)}
                     className="w-4 h-4 rounded border-slate-300 text-purple-600 focus:ring-purple-500"
                   />
-                  <div className="flex items-center gap-2">
+                  <div className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
                     <div className={`w-6 h-6 rounded-full flex items-center justify-center text-white text-xs ${student.gender === 'male' ? 'bg-blue-500' : 'bg-pink-500'}`}>
                       {student.name.charAt(0)}
                     </div>
@@ -329,12 +338,12 @@ export default function ParentsPage() {
             </div>
           </div>
           
-          <div className="flex justify-end gap-3 pt-4">
+          <div className={`flex justify-end gap-3 pt-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
             <Button type="button" variant="secondary" onClick={() => setIsModalOpen(false)}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button type="submit">
-              {editingParent ? 'Update' : 'Add'} Parent
+              {editingParent ? t('common.update') : t('common.add')} {t('role.parent')}
             </Button>
           </div>
         </form>
@@ -342,4 +351,3 @@ export default function ParentsPage() {
     </DashboardLayout>
   );
 }
-

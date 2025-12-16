@@ -3,6 +3,8 @@
 import React from 'react';
 import { Bell, Search, Menu } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 
 interface HeaderProps {
   title: string;
@@ -12,6 +14,7 @@ interface HeaderProps {
 
 export function Header({ title, subtitle, onMenuClick }: HeaderProps) {
   const { user } = useAuth();
+  const { t, isRTL } = useLanguage();
 
   return (
     <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-slate-200/50">
@@ -33,14 +36,14 @@ export function Header({ title, subtitle, onMenuClick }: HeaderProps) {
           </div>
         </div>
         
-        <div className="flex items-center gap-2 sm:gap-4">
+        <div className={`flex items-center gap-2 sm:gap-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
           {/* Search */}
           <div className="relative hidden md:block">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Search className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400`} />
             <input
               type="text"
-              placeholder="Search..."
-              className="w-48 lg:w-64 pl-10 pr-4 py-2 rounded-xl border border-slate-200 bg-slate-50 text-sm focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/10 focus:bg-white transition-all"
+              placeholder={`${t('common.search')}...`}
+              className={`w-48 lg:w-64 ${isRTL ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-2 rounded-xl border border-slate-200 bg-slate-50 text-sm focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/10 focus:bg-white transition-all`}
             />
           </div>
 
@@ -49,15 +52,18 @@ export function Header({ title, subtitle, onMenuClick }: HeaderProps) {
             <Search className="w-5 h-5 text-slate-600" />
           </button>
 
+          {/* Language Switcher */}
+          <LanguageSwitcher variant="compact" />
+
           {/* Notifications */}
           <button className="relative p-2 rounded-xl hover:bg-slate-100 transition-colors">
             <Bell className="w-5 h-5 text-slate-600" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full ring-2 ring-white" />
+            <span className={`absolute top-1.5 ${isRTL ? 'left-1.5' : 'right-1.5'} w-2 h-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full ring-2 ring-white`} />
           </button>
 
           {/* User Avatar */}
-          <div className="flex items-center gap-3 pl-2 sm:pl-4 border-l border-slate-200">
-            <div className="text-right hidden sm:block">
+          <div className={`flex items-center gap-3 ${isRTL ? 'pr-2 sm:pr-4 border-r' : 'pl-2 sm:pl-4 border-l'} border-slate-200`}>
+            <div className={`text-${isRTL ? 'left' : 'right'} hidden sm:block`}>
               <p className="text-sm font-semibold text-slate-900">{user?.name}</p>
               <p className="text-xs text-slate-500">{user?.email}</p>
             </div>

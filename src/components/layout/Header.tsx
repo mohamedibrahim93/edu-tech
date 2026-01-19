@@ -67,7 +67,7 @@ export function Header({ title, subtitle, onMenuClick }: HeaderProps) {
               <p className="text-sm font-semibold text-slate-900">{user?.name}</p>
               <p className="text-xs text-slate-500">{user?.email}</p>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center text-white font-bold shadow-lg shadow-purple-500/25">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center text-white font-bold">
               {user?.name?.charAt(0) || 'U'}
             </div>
           </div>

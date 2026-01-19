@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { School, Mail, Lock, Eye, EyeOff, ArrowRight, ArrowLeft } from 'lucide-react';
+import { School, Mail, Lock, Eye, EyeOff, ArrowRight, ArrowLeft, Github, Linkedin } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
@@ -115,8 +115,29 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <div className="relative z-10 text-white/60 text-sm">
-          © 2025 {t('app.name')}. {isRTL ? 'جميع الحقوق محفوظة.' : 'All rights reserved.'}
+        <div className="relative z-10 flex items-center gap-3 text-white/60 text-sm">
+          <span>© 2025 {t('app.name')}. {isRTL ? 'جميع الحقوق محفوظة.' : 'All rights reserved.'}</span>
+          <span className="flex items-center gap-2">
+            <span>Mohamed Ibrahim</span>
+            <a 
+              href="https://github.com/mohamedibrahim93" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-white/60 hover:text-white transition-colors"
+              aria-label="GitHub"
+            >
+              <Github className="w-4 h-4" />
+            </a>
+            <a 
+              href="https://www.linkedin.com/in/mohamed-ibrahim9322/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-white/60 hover:text-white transition-colors"
+              aria-label="LinkedIn"
+            >
+              <Linkedin className="w-4 h-4" />
+            </a>
+          </span>
         </div>
       </div>
 

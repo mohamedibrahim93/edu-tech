@@ -17,6 +17,8 @@ import {
   ArrowLeft,
   Sparkles,
   Shield,
+  Github,
+  Linkedin,
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
@@ -315,9 +317,30 @@ export default function HomePage() {
             </div>
             <span className="text-lg font-bold text-slate-900">{t('app.name')}</span>
           </div>
-          <p className="text-sm text-slate-500">
-            © 2025 {t('app.name')}. {isRTL ? 'جميع الحقوق محفوظة.' : 'All rights reserved.'}  Mohamed AL-Driny
-          </p>
+          <div className="flex items-center gap-3 text-sm text-slate-500">
+            <span>© 2025 {t('app.name')}. {isRTL ? 'جميع الحقوق محفوظة.' : 'All rights reserved.'}</span>
+            <span className="flex items-center gap-2">
+              <span>Mohamed Ibrahim</span>
+              <a 
+                href="https://github.com/mohamedibrahim93" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-slate-400 hover:text-slate-700 transition-colors"
+                aria-label="GitHub"
+              >
+                <Github className="w-4 h-4" />
+              </a>
+              <a 
+                href="https://www.linkedin.com/in/mohamed-ibrahim9322/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-slate-400 hover:text-[#0A66C2] transition-colors"
+                aria-label="LinkedIn"
+              >
+                <Linkedin className="w-4 h-4" />
+              </a>
+            </span>
+          </div>
         </div>
       </footer>
     </div>

@@ -122,7 +122,7 @@ export default function HomePage() {
               }
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="/login" className="w-full sm:w-auto px-8 py-4 text-lg font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl hover:opacity-90 transition-all shadow-lg shadow-purple-500/30 flex items-center justify-center gap-2 hover:shadow-xl hover:shadow-purple-500/40">
+              <Link href="/login" className="w-full sm:w-auto px-8 py-4 text-lg font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl hover:opacity-90 transition-all flex items-center justify-center gap-2">
                 {isRTL ? 'ابدأ تجربة مجانية' : 'Start Free Trial'}
                 <Arrow className="w-5 h-5" />
               </Link>
@@ -299,7 +299,7 @@ export default function HomePage() {
               : 'Join schools already using EduTech to streamline administration and keep everyone connected.'
             }
           </p>
-          <Link href="/login" className="inline-flex items-center gap-2 px-8 py-4 text-lg font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl hover:opacity-90 transition-all shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-purple-500/40">
+          <Link href="/login" className="inline-flex items-center gap-2 px-8 py-4 text-lg font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl hover:opacity-90 transition-all">
             {isRTL ? 'ابدأ مجاناً' : 'Get Started Free'}
             <Arrow className="w-5 h-5" />
           </Link>

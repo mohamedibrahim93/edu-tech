@@ -66,6 +66,7 @@ export default function StudentsPage() {
 
   useEffect(() => {
     loadData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const filteredStudents = students.filter((student) => {
@@ -193,7 +194,7 @@ export default function StudentsPage() {
               {filteredStudents.map((student) => (
                 <div
                   key={student.id}
-                  className="p-4 sm:p-5 rounded-2xl border border-slate-200 hover:border-purple-200 hover:shadow-lg hover:shadow-purple-500/5 transition-all duration-300 group bg-white"
+                  className="p-4 sm:p-5 rounded-2xl border border-slate-200 hover:border-purple-200 transition-all duration-300 group bg-white"
                 >
                   <div className={`flex items-start gap-3 sm:gap-4 mb-3 sm:mb-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
                     <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center text-white font-bold text-base sm:text-lg shadow-lg flex-shrink-0 ${

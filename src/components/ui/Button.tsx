@@ -27,8 +27,7 @@ export function Button({
   const variants = {
     primary: `
       bg-gradient-to-r from-purple-600 to-pink-600 text-white 
-      hover:opacity-90 focus:ring-purple-500 shadow-lg shadow-purple-500/25
-      hover:shadow-xl hover:shadow-purple-500/30
+      hover:opacity-90 focus:ring-purple-200 shadow-lg shadow-purple-500/25
     `,
     secondary: `
       bg-slate-100 text-slate-700 hover:bg-slate-200 

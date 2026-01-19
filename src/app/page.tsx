@@ -316,7 +316,7 @@ export default function HomePage() {
             <span className="text-lg font-bold text-slate-900">{t('app.name')}</span>
           </div>
           <p className="text-sm text-slate-500">
-            © 2025 {t('app.name')}. {isRTL ? 'جميع الحقوق محفوظة.' : 'All rights reserved.'}
+            © 2025 {t('app.name')}. {isRTL ? 'جميع الحقوق محفوظة.' : 'All rights reserved.'}  Mohamed AL-Driny
           </p>
         </div>
       </footer>
